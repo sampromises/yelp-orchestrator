@@ -15,3 +15,6 @@ pytest
 pylint
 black
 isort
+
+boto3
+requests

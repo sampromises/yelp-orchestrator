@@ -1,16 +1,32 @@
+import json
+import os
+from collections import defaultdict
 from http import HTTPStatus
 
-HTTP_METHOD = "httpMethod"
-GET = "GET"
+import boto3
+from boto3.dynamodb.conditions import Key
+
+YELP_TABLE_NAME = os.environ["YELP_TABLE_NAME"]
 
 
-STATUS_CODE = "statusCode"
-BODY = "body"
+def get_items(user_id):
+    table = boto3.resource("dynamodb").Table(YELP_TABLE_NAME)
+    return table.query(KeyConditionExpression=Key("UserId").eq(user_id)).get("Items")
+
+
+def items_to_response(items):
+    response = defaultdict(lambda: defaultdict(dict))
+    for item in items:
+        item_content = {k: str(v) for k, v in item.items() if k not in ("UserId", "SortKey")}
+        response[item["UserId"]][item["SortKey"]] = item_content
+    return response
 
 
 def handle(event, context=None):
     print(f"Triggered for event: {event}")
-    if event[HTTP_METHOD] == GET:
-        print("Handling GET")
-        return {STATUS_CODE: HTTPStatus.OK, BODY: "Hello GET"}
-    return {STATUS_CODE: HTTPStatus.NOT_IMPLEMENTED}
+    if event["httpMethod"] == "GET":
+        user_id = event["queryStringParameters"].get("userId")
+        items = get_items(user_id)
+        response = items_to_response(items)
+        return {"statusCode": HTTPStatus.OK, "body": json.dumps(response)}
+    return {"statusCode": HTTPStatus.NOT_IMPLEMENTED}

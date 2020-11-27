@@ -18,8 +18,13 @@ jobs:
           pip install -r requirements-dev.txt
       - name: Test with pytest
         env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "us-west-1"
           YELP_USER_ID: ${{ secrets.YELP_USER_ID }}
           FETCH_BATCH_SIZE: ${{ secrets.FETCH_BATCH_SIZE }}
+          APIGATEWAY_URL: ${{ secrets.APIGATEWAY_URL }}
+          YELP_TABLE_NAME: ${{ secrets.YELP_TABLE_NAME }}
         run: |
           pip install -e .
           pip install pytest
