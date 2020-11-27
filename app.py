@@ -68,6 +68,7 @@ class YelpOrchestratorStack(core.Stack):
             ),
             sort_key=aws_dynamodb.Attribute(name="SortKey", type=aws_dynamodb.AttributeType.STRING),
             stream=aws_dynamodb.StreamViewType.NEW_IMAGE,
+            time_to_live_attribute="TimeToLive",
         )
 
     def create_url_requester(self):
