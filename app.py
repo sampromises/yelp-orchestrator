@@ -3,6 +3,7 @@ import os
 
 from aws_cdk import (
     aws_apigateway,
+    aws_cloudwatch,
     aws_dynamodb,
     aws_events,
     aws_events_targets,
@@ -40,6 +41,8 @@ class YelpOrchestratorStack(core.Stack):
 
         self.add_permissions()
         self.add_env_vars()
+
+        self.create_dashboard()
 
     def create_page_bucket(self):
         self.page_bucket = aws_s3.Bucket(self, PAGE_BUCKET_NAME)
@@ -152,6 +155,67 @@ class YelpOrchestratorStack(core.Stack):
         for key, val, lambdas in env_vars_to_add:
             for _lambda in lambdas:
                 _lambda.add_environment(key, val)
+
+    def create_dashboard(self):
+        dashboard = aws_cloudwatch.Dashboard(self, "YelpOrchestratorDashboard", start="-P1W")
+        dashboard.add_widgets(
+            self.text_widget("PageBucket", "#"),
+            *self.get_s3_graphs(self.page_bucket),
+            self.text_widget("APIGateway", "#"),
+            *self.get_generic_apig_graphs(self.apig),
+            self.text_widget("ApiGatewayHandler", "#"),
+            *self.get_generic_lambda_graphs(self.apig_handler),
+            self.text_widget("YelpParser", "#"),
+            *self.get_generic_lambda_graphs(self.yelp_parser),
+            self.text_widget("UrlRequester", "#"),
+            *self.get_generic_lambda_graphs(self.url_requester),
+            self.text_widget("PageFetcher", "#"),
+            *self.get_generic_lambda_graphs(self.page_fetcher),
+        )
+        self.dashboard = dashboard
+
+    @staticmethod
+    def get_s3_graphs(bucket):
+        return (
+            YelpOrchestratorStack.graph_widget(
+                "ObjectCount",
+                aws_cloudwatch.Metric(
+                    namespace="AWS/S3",
+                    metric_name="NumberOfObjects",
+                    dimensions={
+                        "StorageType": "AllStorageTypes",
+                        "BucketName": bucket.bucket_name,
+                    },
+                    statistic="Sum",
+                    period=core.Duration.minutes(5),
+                ),
+            ),
+        )
+
+    @staticmethod
+    def get_generic_apig_graphs(apig):
+        return (
+            YelpOrchestratorStack.graph_widget("Count", apig.metric_count()),
+            YelpOrchestratorStack.graph_widget(
+                "Errors", apig.metric_client_error(), apig.metric_server_error()
+            ),
+        )
+
+    @staticmethod
+    def get_generic_lambda_graphs(_lambda):
+        return (
+            YelpOrchestratorStack.graph_widget("Invocations", _lambda.metric_invocations()),
+            YelpOrchestratorStack.graph_widget("Duration", _lambda.metric_duration()),
+            YelpOrchestratorStack.graph_widget("Errors", _lambda.metric_errors()),
+        )
+
+    @staticmethod
+    def text_widget(text, size="###"):
+        return aws_cloudwatch.TextWidget(markdown=f"{size} {text}", height=1, width=24)
+
+    @staticmethod
+    def graph_widget(title, *metrics):
+        return aws_cloudwatch.GraphWidget(title=title, left=list(metrics), height=6, width=8)
 
     @staticmethod
     def snake_to_pascal_case(name):

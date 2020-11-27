@@ -10,6 +10,7 @@ aws-cdk.aws_events
 aws-cdk.aws_s3
 aws-cdk.aws_s3_notifications
 aws-cdk.aws_dynamodb
+aws-cdk.aws_cloudwatch
 
 pytest
 pylint
