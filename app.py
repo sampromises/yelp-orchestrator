@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import os
+import subprocess
+from os import path
 
 from aws_cdk import (
     aws_apigateway,
@@ -16,6 +18,7 @@ from aws_cdk import (
 
 YELP_USER_ID = os.environ["YELP_USER_ID"]
 FETCH_BATCH_SIZE = os.environ["FETCH_BATCH_SIZE"]
+URL_TABLE_TTL = os.environ["URL_TABLE_TTL"]
 
 STACK_NAME = "YelpOrchestrator"
 API_NAME = "YelpOrchestratorAPI"
@@ -120,7 +123,29 @@ class YelpOrchestratorStack(core.Stack):
             handler=f"{lambda_name}.handle",
             code=aws_lambda.Code.asset("./lambda"),
             timeout=core.Duration.seconds(300),
+            layers=self.create_dependencies_layer(lambda_name),
         )
+
+    # Taken from: https://stackoverflow.com/a/61248003
+    def create_dependencies_layer(self, function_name) -> aws_lambda.LayerVersion:
+        requirements_file = "lambda_dependencies/" + function_name + ".txt"
+        output_dir = ".lambda_dependencies/" + function_name
+
+        # Install requirements for layer in the output_dir
+        if path.exists(requirements_file):
+            # Note: Pip will create the output dir if it does not exist
+            subprocess.check_call(
+                f"pip install -r {requirements_file} -t {output_dir}/python".split()
+            )
+            return [
+                aws_lambda.LayerVersion(
+                    self,
+                    STACK_NAME + "-" + function_name + "-dependencies",
+                    code=aws_lambda.Code.from_asset(output_dir),
+                )
+            ]
+
+        return []
 
     def create_apigateway(self):
         self.apig = aws_apigateway.LambdaRestApi(
@@ -156,6 +181,7 @@ class YelpOrchestratorStack(core.Stack):
                 (self.apig_handler, self.yelp_parser, self.url_requester),
             ),
             ("FETCH_BATCH_SIZE", FETCH_BATCH_SIZE, (self.page_fetcher,)),
+            ("URL_TABLE_TTL", URL_TABLE_TTL, (self.page_fetcher,)),
         )
         for key, val, lambdas in env_vars_to_add:
             for _lambda in lambdas:

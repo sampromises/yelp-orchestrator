@@ -19,3 +19,4 @@ isort
 
 boto3
 requests
+freezegun
