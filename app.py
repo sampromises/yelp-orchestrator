@@ -45,7 +45,11 @@ class YelpOrchestratorStack(core.Stack):
         self.create_dashboard()
 
     def create_page_bucket(self):
-        self.page_bucket = aws_s3.Bucket(self, PAGE_BUCKET_NAME)
+        self.page_bucket = aws_s3.Bucket(
+            self,
+            PAGE_BUCKET_NAME,
+            lifecycle_rules=[aws_s3.LifecycleRule(expiration=core.Duration.days(1))],
+        )
 
     def create_url_table(self):
         self.url_table = aws_dynamodb.Table(
