@@ -25,6 +25,10 @@ jobs:
           FETCH_BATCH_SIZE: ${{ secrets.FETCH_BATCH_SIZE }}
           APIGATEWAY_URL: ${{ secrets.APIGATEWAY_URL }}
           YELP_TABLE_NAME: ${{ secrets.YELP_TABLE_NAME }}
+          URL_TABLE_NAME: ${{ secrets.URL_TABLE_NAME }}
+          URL_TABLE_TTL: ${{ secrets.URL_TABLE_TTL }}
+          PAGE_BUCKET_NAME: ${{ secrets.PAGE_BUCKET_NAME }}
+          PAGE_FETCHER_LAMBDA_NAME: ${{ secrets.PAGE_FETCHER_LAMBDA_NAME }}
         run: |
           pip install -e .
           pip install pytest
