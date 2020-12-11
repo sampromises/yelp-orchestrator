@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 
 from boto3.dynamodb.conditions import Key
 from freezegun import freeze_time
-from tests.util import random_string
 
 from persistence import yelp_table
 from persistence.yelp_table import (
@@ -21,7 +20,9 @@ from persistence.yelp_table import (
 
 @freeze_time("2020-08-23")
 def test_calculate_ttl():
-    assert _calculate_ttl(24) == int(datetime(2020, 8, 23).timestamp()) + 24
+    ttl = 24
+    yelp_table.YELP_TABLE_TTL = ttl
+    assert _calculate_ttl() == int(datetime(2020, 8, 23).timestamp()) + ttl
 
 
 @freeze_time("2020-08-23")
@@ -75,9 +76,10 @@ def test_upsert_metadata(mock_upsert_record, mock_calculate_ttl):
 
     ttl = "test-ttl"
     mock_calculate_ttl.return_value = ttl
+    yelp_table.YELP_TABLE_TTL = ttl
 
     # When
-    upsert_metadata(user_id, user_metadata, Mock())
+    upsert_metadata(user_id, user_metadata)
 
     # Then
     mock_upsert_record.assert_called_once_with(
@@ -105,7 +107,7 @@ def test_upsert_review(mock_upsert_record, mock_calculate_ttl):
     mock_calculate_ttl.return_value = ttl
 
     # When
-    upsert_review(user_id, review_id, review_metadata, Mock())
+    upsert_review(user_id, review_id, review_metadata)
 
     # Then
     mock_upsert_record.assert_called_once_with(

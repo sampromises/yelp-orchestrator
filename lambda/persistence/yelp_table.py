@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import boto3
 from boto3.dynamodb.conditions import Key
-from config import YELP_TABLE_NAME
+from config import YELP_TABLE_NAME, YELP_TABLE_TTL
 
 YELP_TABLE = boto3.resource("dynamodb").Table(YELP_TABLE_NAME)
 
@@ -37,8 +37,8 @@ ReviewId = namedtuple("ReviewId", "biz_id review_id")
 ReviewMetadata = namedtuple("ReviewMetadata", "biz_name biz_address review_date")
 
 
-def _calculate_ttl(ttl) -> int:
-    return int(time.time()) + int(ttl)
+def _calculate_ttl() -> int:
+    return int(time.time()) + int(YELP_TABLE_TTL)
 
 
 def _upsert_record(user_id, sort_key, update_expression, expression_attribute_values):
@@ -59,7 +59,7 @@ def get_all_records(user_id):
     ]
 
 
-def upsert_metadata(user_id, user_metadata: UserMetadata, ttl):
+def upsert_metadata(user_id, user_metadata: UserMetadata):
     _upsert_record(
         user_id,
         _MetadataSchema.SORT_KEY_VALUE,
@@ -73,12 +73,12 @@ def upsert_metadata(user_id, user_metadata: UserMetadata, ttl):
             ":name": user_metadata.name,
             ":city": user_metadata.city,
             ":review_count": user_metadata.review_count,
-            ":ttl": _calculate_ttl(ttl),
+            ":ttl": _calculate_ttl(),
         },
     )
 
 
-def upsert_review(user_id, review_id: ReviewId, review_metadata: ReviewMetadata, ttl):
+def upsert_review(user_id, review_id: ReviewId, review_metadata: ReviewMetadata):
     _upsert_record(
         user_id,
         f"{_ReviewSchema.SORT_KEY_VALUE}#{review_id.biz_id}",
@@ -96,7 +96,7 @@ def upsert_review(user_id, review_id: ReviewId, review_metadata: ReviewMetadata,
             ":biz_name": review_metadata.biz_name,
             ":biz_address": review_metadata.biz_address,
             ":review_date": review_metadata.review_date,
-            ":ttl": _calculate_ttl(ttl),
+            ":ttl": _calculate_ttl(),
         },
     )
 
