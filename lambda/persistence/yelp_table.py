@@ -38,8 +38,8 @@ ReviewId = namedtuple("ReviewId", "biz_id review_id")
 ReviewMetadata = namedtuple("ReviewMetadata", "biz_name biz_address review_date")
 
 
-def _calculate_ttl(ttl):
-    return int(time.time()) + ttl
+def _calculate_ttl(ttl) -> int:
+    return int(time.time()) + int(ttl)
 
 
 def _upsert_record(user_id, sort_key, update_expression, expression_attribute_values):
