@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 
+from persistence import url_table
 from persistence.url_table import get_all_url_items, update_fetched_url, upsert_new_url
 
 
@@ -29,8 +30,10 @@ def test_upsert_new_url(mock_table):
     url = "https://foo.com"
     ttl = 24
 
+    url_table.URL_TABLE_TTL = ttl
+
     # When
-    upsert_new_url(url, ttl)
+    upsert_new_url(url)
 
     # Then
     mock_table.update_item.assert_called_once_with(
