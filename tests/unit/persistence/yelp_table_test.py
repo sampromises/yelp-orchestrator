@@ -9,20 +9,12 @@ from persistence.yelp_table import (
     ReviewId,
     ReviewMetadata,
     UserMetadata,
-    _calculate_ttl,
     _upsert_record,
     get_all_records,
     update_review_status,
     upsert_metadata,
     upsert_review,
 )
-
-
-@freeze_time("2020-08-23")
-def test_calculate_ttl():
-    ttl = 24
-    yelp_table.YELP_TABLE_TTL = ttl
-    assert _calculate_ttl() == int(datetime(2020, 8, 23).timestamp()) + ttl
 
 
 @freeze_time("2020-08-23")
@@ -67,7 +59,7 @@ def test_get_all_records():
     mock_yelp_table.query.assert_called_once_with(KeyConditionExpression=Key("UserId").eq(user_id))
 
 
-@patch("persistence.yelp_table._calculate_ttl")
+@patch("persistence.yelp_table.calculate_ttl")
 @patch("persistence.yelp_table._upsert_record")
 def test_upsert_metadata(mock_upsert_record, mock_calculate_ttl):
     # Given
@@ -76,10 +68,9 @@ def test_upsert_metadata(mock_upsert_record, mock_calculate_ttl):
 
     ttl = "test-ttl"
     mock_calculate_ttl.return_value = ttl
-    yelp_table.YELP_TABLE_TTL = ttl
 
     # When
-    upsert_metadata(user_id, user_metadata)
+    upsert_metadata(user_id, user_metadata, ttl)
 
     # Then
     mock_upsert_record.assert_called_once_with(
@@ -95,7 +86,7 @@ def test_upsert_metadata(mock_upsert_record, mock_calculate_ttl):
     )
 
 
-@patch("persistence.yelp_table._calculate_ttl")
+@patch("persistence.yelp_table.calculate_ttl")
 @patch("persistence.yelp_table._upsert_record")
 def test_upsert_review(mock_upsert_record, mock_calculate_ttl):
     # Given
@@ -125,9 +116,8 @@ def test_upsert_review(mock_upsert_record, mock_calculate_ttl):
     )
 
 
-@patch("persistence.yelp_table._calculate_ttl")
 @patch("persistence.yelp_table._upsert_record")
-def test_update_review_status(mock_upsert_record, mock_calculate_ttl):
+def test_update_review_status(mock_upsert_record):
     # Given
     user_id = "test-user-id"
     review_id = ReviewId("test-biz-id", "test-review-id")

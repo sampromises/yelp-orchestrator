@@ -30,10 +30,8 @@ def test_upsert_new_url(mock_table):
     url = "https://foo.com"
     ttl = 24
 
-    url_table.URL_TABLE_TTL = ttl
-
     # When
-    upsert_new_url(url)
+    upsert_new_url(url, ttl)
 
     # Then
     mock_table.update_item.assert_called_once_with(

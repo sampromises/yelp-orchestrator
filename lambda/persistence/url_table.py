@@ -3,6 +3,8 @@ import time
 import boto3
 from config import URL_TABLE_NAME, URL_TABLE_TTL
 
+from persistence._util import calculate_ttl
+
 URL_TABLE = boto3.resource("dynamodb").Table(URL_TABLE_NAME)
 
 
@@ -11,10 +13,6 @@ class UrlTableSchema:
     LAST_FETCHED = "LastFetched"
     ERROR = "ErrorMessage"
     TTL = "TimeToLive"
-
-
-def _calculate_ttl() -> int:
-    return int(time.time()) + int(URL_TABLE_TTL)
 
 
 def _update_item(url, update_expression, expression_attribute_values):
@@ -37,11 +35,12 @@ def get_all_url_items():
     return items
 
 
-def upsert_new_url(url):
+def upsert_new_url(url, ttl=URL_TABLE_TTL):
+    print(f"upsert_new_url({ttl=})")
     _update_item(
         url=url,
         update_expression=f"set {UrlTableSchema.TTL}=:ttl",
-        expression_attribute_values={":ttl": _calculate_ttl()},
+        expression_attribute_values={":ttl": calculate_ttl(ttl)},
     )
 
 
