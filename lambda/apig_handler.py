@@ -1,12 +1,11 @@
 import json
-import os
 from collections import defaultdict
 from http import HTTPStatus
 
 import boto3
 from boto3.dynamodb.conditions import Key
 
-YELP_TABLE_NAME = os.environ["YELP_TABLE_NAME"]
+from config import YELP_TABLE_NAME
 
 
 def get_items(user_id):

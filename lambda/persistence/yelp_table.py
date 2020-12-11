@@ -1,11 +1,10 @@
-import os
 import time
 from collections import namedtuple
 
 import boto3
 from boto3.dynamodb.conditions import Key
+from config import YELP_TABLE_NAME
 
-YELP_TABLE_NAME = os.environ["YELP_TABLE_NAME"]
 YELP_TABLE = boto3.resource("dynamodb").Table(YELP_TABLE_NAME)
 
 

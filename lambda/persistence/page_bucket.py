@@ -1,9 +1,8 @@
-import os
 from urllib.parse import quote_plus, unquote_plus
 
 import boto3
+from config import PAGE_BUCKET_NAME
 
-PAGE_BUCKET_NAME = os.environ["PAGE_BUCKET_NAME"]
 S3 = boto3.resource("s3")
 
 

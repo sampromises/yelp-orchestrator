@@ -1,9 +1,7 @@
-import os
 import time
 
 import boto3
-
-URL_TABLE_NAME = os.environ["URL_TABLE_NAME"]
+from config import URL_TABLE_NAME
 
 URL_TABLE = boto3.resource("dynamodb").Table(URL_TABLE_NAME)
 

@@ -1,19 +1,15 @@
-import os
-
 import requests
 
+from config import FETCH_BATCH_SIZE
 from persistence.page_bucket import upload_page
 from persistence.url_table import get_all_url_items, update_fetched_url
-
-BATCH_SIZE = int(os.environ["FETCH_BATCH_SIZE"])
-URL_TABLE_TTL = int(os.environ["URL_TABLE_TTL"])
 
 
 def gather_batch():
     all_items = get_all_url_items()
     ok_items = filter(lambda item: not item.get("ErrorMessage"), all_items)
     sorted_items = sorted(ok_items, key=lambda x: x.get("Date") or 0)
-    return sorted_items[:BATCH_SIZE]
+    return sorted_items[:FETCH_BATCH_SIZE]
 
 
 def process_item(item):

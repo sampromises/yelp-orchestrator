@@ -36,10 +36,12 @@ class YelpOrchestratorStack(core.Stack):
         self.create_url_table()
         self.create_yelp_table()
 
-        self.create_url_requester()
-        self.create_page_fetcher()
-        self.create_yelp_parser()
-        self.create_apig_handler()
+        self._lambdas = (
+            self.create_url_requester(),
+            self.create_page_fetcher(),
+            self.create_yelp_parser(),
+            self.create_apig_handler(),
+        )
 
         self.create_apigateway()
 
@@ -91,6 +93,7 @@ class YelpOrchestratorStack(core.Stack):
             )
         )
         self.url_requester = url_requester
+        return self.url_requester
 
     def create_page_fetcher(self):
         page_fetcher = self.create_lambda("page_fetcher")
@@ -103,6 +106,7 @@ class YelpOrchestratorStack(core.Stack):
         )
         rule.add_target(aws_events_targets.LambdaFunction(page_fetcher))
         self.page_fetcher = page_fetcher
+        return self.page_fetcher
 
     def create_yelp_parser(self):
         yelp_parser = self.create_lambda("yelp_parser")
@@ -111,10 +115,12 @@ class YelpOrchestratorStack(core.Stack):
             aws_s3_notifications.LambdaDestination(yelp_parser),
         )
         self.yelp_parser = yelp_parser
+        return self.yelp_parser
 
     def create_apig_handler(self):
         apig_handler = self.create_lambda("apig_handler")
         self.apig_handler = apig_handler
+        return self.apig_handler
 
     def create_lambda(self, lambda_name):
         return aws_lambda.Function(
@@ -164,30 +170,18 @@ class YelpOrchestratorStack(core.Stack):
         self.page_bucket.grant_read_write(self.page_fetcher)
 
     def add_env_vars(self):
-        env_vars_to_add = (
-            (
-                "YELP_TABLE_NAME",
-                self.yelp_table.table_name,
-                (self.apig_handler, self.yelp_parser, self.url_requester),
-            ),
-            ("URL_TABLE_NAME", self.url_table.table_name, (self.url_requester, self.page_fetcher)),
-            (
-                "PAGE_BUCKET_NAME",
-                self.page_bucket.bucket_name,
-                (self.yelp_parser, self.page_fetcher),
-            ),
-            (
-                "YELP_USER_ID",
-                YELP_USER_ID,
-                (self.apig_handler, self.yelp_parser, self.url_requester),
-            ),
-            ("FETCH_BATCH_SIZE", FETCH_BATCH_SIZE, (self.page_fetcher,)),
-            ("URL_TABLE_TTL", URL_TABLE_TTL, (self.page_fetcher,)),
-            ("YELP_TABLE_TTL", YELP_TABLE_TTL, (self.yelp_parser,)),
-        )
-        for key, val, lambdas in env_vars_to_add:
-            for _lambda in lambdas:
-                _lambda.add_environment(key, val)
+        env_vars_to_add = {
+            "YELP_TABLE_NAME": self.yelp_table.table_name,
+            "URL_TABLE_NAME": self.url_table.table_name,
+            "PAGE_BUCKET_NAME": self.page_bucket.bucket_name,
+            "YELP_USER_ID": YELP_USER_ID,
+            "FETCH_BATCH_SIZE": FETCH_BATCH_SIZE,
+            "URL_TABLE_TTL": URL_TABLE_TTL,
+            "YELP_TABLE_TTL": YELP_TABLE_TTL,
+        }
+        for _lambda in self._lambdas:
+            for k, v in env_vars_to_add.items():
+                _lambda.add_environment(k, v)
 
     def create_dashboard(self):
         dashboard = aws_cloudwatch.Dashboard(self, "YelpOrchestratorDashboard", start="-P1W")

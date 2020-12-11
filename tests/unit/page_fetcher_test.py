@@ -17,7 +17,7 @@ def test_gather_batch(mock_get_all_url_items):
         {"Url": "4", "Date": 4},
         {"Url": "5", "Date": 5},
     ]
-    page_fetcher.BATCH_SIZE = 3
+    page_fetcher.FETCH_BATCH_SIZE = 3
 
     # When
     batch = gather_batch()
