@@ -19,6 +19,7 @@ from aws_cdk import (
 YELP_USER_ID = os.environ["YELP_USER_ID"]
 FETCH_BATCH_SIZE = os.environ["FETCH_BATCH_SIZE"]
 URL_TABLE_TTL = os.environ["URL_TABLE_TTL"]
+YELP_TABLE_TTL = os.environ["YELP_TABLE_TTL"]
 
 STACK_NAME = "YelpOrchestrator"
 API_NAME = "YelpOrchestratorAPI"
@@ -182,6 +183,7 @@ class YelpOrchestratorStack(core.Stack):
             ),
             ("FETCH_BATCH_SIZE", FETCH_BATCH_SIZE, (self.page_fetcher,)),
             ("URL_TABLE_TTL", URL_TABLE_TTL, (self.page_fetcher,)),
+            ("YELP_TABLE_TTL", YELP_TABLE_TTL, (self.yelp_parser,)),
         )
         for key, val, lambdas in env_vars_to_add:
             for _lambda in lambdas:
