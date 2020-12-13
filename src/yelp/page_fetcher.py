@@ -1,8 +1,8 @@
 import requests
 
-from config import FETCH_BATCH_SIZE
-from persistence.page_bucket import upload_page
-from persistence.url_table import get_all_url_items, update_fetched_url
+from yelp.config import FETCH_BATCH_SIZE
+from yelp.persistence.page_bucket import upload_page
+from yelp.persistence.url_table import get_all_url_items, update_fetched_url
 
 
 def gather_batch():

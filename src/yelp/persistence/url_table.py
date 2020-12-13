@@ -1,9 +1,8 @@
 import time
 
 import boto3
-from config import URL_TABLE_NAME, URL_TABLE_TTL
-
-from persistence._util import calculate_ttl
+from yelp.config import URL_TABLE_NAME, URL_TABLE_TTL
+from yelp.persistence._util import calculate_ttl
 
 URL_TABLE = boto3.resource("dynamodb").Table(URL_TABLE_NAME)
 

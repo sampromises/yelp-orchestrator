@@ -2,9 +2,8 @@ import os
 
 import boto3
 from tests.util import random_string
-
-from persistence import page_bucket
-from persistence.page_bucket import KeyUtils
+from yelp.persistence import page_bucket
+from yelp.persistence.page_bucket import KeyUtils
 
 PAGE_BUCKET_NAME = os.environ["PAGE_BUCKET_NAME"]
 S3 = boto3.resource("s3")

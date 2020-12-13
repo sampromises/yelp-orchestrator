@@ -1,11 +1,11 @@
 from unittest.mock import Mock, patch
 
-import page_fetcher
 from freezegun import freeze_time
-from page_fetcher import gather_batch, process_item
+from yelp import page_fetcher
+from yelp.page_fetcher import gather_batch, process_item
 
 
-@patch("page_fetcher.get_all_url_items")
+@patch("yelp.page_fetcher.get_all_url_items")
 def test_gather_batch(mock_get_all_url_items):
     # Given
     mock_get_all_url_items.return_value = [
@@ -31,9 +31,9 @@ def test_gather_batch(mock_get_all_url_items):
 
 
 @freeze_time("2020-08-23")
-@patch("page_fetcher.upload_page")
-@patch("page_fetcher.update_fetched_url")
-@patch("page_fetcher.requests")
+@patch("yelp.page_fetcher.upload_page")
+@patch("yelp.page_fetcher.update_fetched_url")
+@patch("yelp.page_fetcher.requests")
 def test_process_item_success(mock_requests, mock_update_fetched_url, mock_upload_page):
     # Given
     url = "https://foo.com"
@@ -53,9 +53,9 @@ def test_process_item_success(mock_requests, mock_update_fetched_url, mock_uploa
 
 
 @freeze_time("2020-08-23")
-@patch("page_fetcher.upload_page")
-@patch("page_fetcher.update_fetched_url")
-@patch("page_fetcher.requests")
+@patch("yelp.page_fetcher.upload_page")
+@patch("yelp.page_fetcher.update_fetched_url")
+@patch("yelp.page_fetcher.requests")
 def test_process_item_error(mock_requests, mock_update_fetched_url, mock_upload_page):
     # Given
     url = "https://foo.com"

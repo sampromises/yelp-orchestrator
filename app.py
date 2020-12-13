@@ -127,8 +127,8 @@ class YelpOrchestratorStack(core.Stack):
             self,
             self.snake_to_pascal_case(lambda_name),
             runtime=aws_lambda.Runtime.PYTHON_3_8,
-            handler=f"{lambda_name}.handle",
-            code=aws_lambda.Code.asset("./lambda"),
+            handler=f"yelp.{lambda_name}.handle",
+            code=aws_lambda.Code.asset("./src"),
             timeout=core.Duration.seconds(300),
             layers=self.create_dependencies_layer(lambda_name),
         )

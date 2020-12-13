@@ -3,9 +3,8 @@ from collections import namedtuple
 
 import boto3
 from boto3.dynamodb.conditions import Key
-from config import YELP_TABLE_NAME, YELP_TABLE_TTL
-
-from persistence._util import calculate_ttl
+from yelp.config import YELP_TABLE_NAME, YELP_TABLE_TTL
+from yelp.persistence._util import calculate_ttl
 
 YELP_TABLE = boto3.resource("dynamodb").Table(YELP_TABLE_NAME)
 

@@ -1,8 +1,7 @@
 from datetime import datetime
 
 from freezegun import freeze_time
-
-from persistence._util import calculate_ttl
+from yelp.persistence._util import calculate_ttl
 
 
 @freeze_time("2020-08-23")

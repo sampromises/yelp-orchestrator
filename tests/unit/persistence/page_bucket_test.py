@@ -2,9 +2,8 @@ import unittest
 from unittest.mock import Mock, patch
 
 from tests.util import random_string
-
-from persistence import page_bucket
-from persistence.page_bucket import KeyUtils, download_page, upload_page
+from yelp.persistence import page_bucket
+from yelp.persistence.page_bucket import KeyUtils, download_page, upload_page
 
 
 class TestKeyUtils(unittest.TestCase):
@@ -27,7 +26,7 @@ class TestKeyUtils(unittest.TestCase):
         )
 
 
-@patch("persistence.page_bucket.KeyUtils")
+@patch("yelp.persistence.page_bucket.KeyUtils")
 def test_upload_page(mock_key_utils):
     # Given
     page_bucket_name = "test-bucket-name"
@@ -51,7 +50,7 @@ def test_upload_page(mock_key_utils):
     mock_obj.put.assert_called_once_with(Body=html_bytes)
 
 
-@patch("persistence.page_bucket.KeyUtils")
+@patch("yelp.persistence.page_bucket.KeyUtils")
 def test_download_page(mock_key_utils):
     # Given
     page_bucket_name = "test-bucket-name"

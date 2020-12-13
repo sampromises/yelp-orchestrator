@@ -3,9 +3,8 @@ from unittest.mock import Mock, patch
 
 from boto3.dynamodb.conditions import Key
 from freezegun import freeze_time
-
-from persistence import yelp_table
-from persistence.yelp_table import (
+from yelp.persistence import yelp_table
+from yelp.persistence.yelp_table import (
     ReviewId,
     ReviewMetadata,
     UserMetadata,
@@ -59,8 +58,8 @@ def test_get_all_records():
     mock_yelp_table.query.assert_called_once_with(KeyConditionExpression=Key("UserId").eq(user_id))
 
 
-@patch("persistence.yelp_table.calculate_ttl")
-@patch("persistence.yelp_table._upsert_record")
+@patch("yelp.persistence.yelp_table.calculate_ttl")
+@patch("yelp.persistence.yelp_table._upsert_record")
 def test_upsert_metadata(mock_upsert_record, mock_calculate_ttl):
     # Given
     user_id = "test-user-id"
@@ -86,8 +85,8 @@ def test_upsert_metadata(mock_upsert_record, mock_calculate_ttl):
     )
 
 
-@patch("persistence.yelp_table.calculate_ttl")
-@patch("persistence.yelp_table._upsert_record")
+@patch("yelp.persistence.yelp_table.calculate_ttl")
+@patch("yelp.persistence.yelp_table._upsert_record")
 def test_upsert_review(mock_upsert_record, mock_calculate_ttl):
     # Given
     user_id = "test-user-id"
@@ -116,7 +115,7 @@ def test_upsert_review(mock_upsert_record, mock_calculate_ttl):
     )
 
 
-@patch("persistence.yelp_table._upsert_record")
+@patch("yelp.persistence.yelp_table._upsert_record")
 def test_update_review_status(mock_upsert_record):
     # Given
     user_id = "test-user-id"

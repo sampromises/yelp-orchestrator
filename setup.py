@@ -11,7 +11,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="author",
-    package_dir={"": "lambda"},
+    package_dir={"": "src"},
     install_requires=[
         "aws-cdk.core==1.75.0",
     ],

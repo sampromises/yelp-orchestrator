@@ -3,8 +3,7 @@ import time
 
 import boto3
 from tests.util import random_int, random_string
-
-from persistence.yelp_table import (
+from yelp.persistence.yelp_table import (
     ReviewId,
     ReviewMetadata,
     UserMetadata,

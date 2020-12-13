@@ -1,11 +1,11 @@
 from unittest.mock import Mock, patch
 
-from apig_handler import get_items, handle, items_to_response
 from boto3.dynamodb.conditions import Key
 from tests.util import random_string
+from yelp.apig_handler import get_items, handle, items_to_response
 
 
-@patch("apig_handler.boto3.resource")
+@patch("yelp.apig_handler.boto3.resource")
 def test_get_items(mock_resource):
     # Given
     user_id = random_string()
@@ -42,8 +42,8 @@ def test_items_to_response():
     }
 
 
-@patch("apig_handler.items_to_response")
-@patch("apig_handler.get_items")
+@patch("yelp.apig_handler.items_to_response")
+@patch("yelp.apig_handler.get_items")
 def test_handle(mock_get_items, mock_items_to_response):
     # Given
     response = {"foo": "bar", "biz": 42}

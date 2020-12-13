@@ -2,8 +2,7 @@ import os
 import time
 
 import boto3
-
-from persistence.url_table import get_all_url_items, update_fetched_url, upsert_new_url
+from yelp.persistence.url_table import get_all_url_items, update_fetched_url, upsert_new_url
 
 URL_TABLE_NAME = os.environ["URL_TABLE_NAME"]
 URL_TABLE = boto3.resource("dynamodb").Table(URL_TABLE_NAME)

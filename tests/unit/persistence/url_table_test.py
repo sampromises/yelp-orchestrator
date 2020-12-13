@@ -2,12 +2,11 @@ from datetime import datetime
 from unittest.mock import patch
 
 from freezegun import freeze_time
+from yelp.persistence import url_table
+from yelp.persistence.url_table import get_all_url_items, update_fetched_url, upsert_new_url
 
-from persistence import url_table
-from persistence.url_table import get_all_url_items, update_fetched_url, upsert_new_url
 
-
-@patch("persistence.url_table.URL_TABLE")
+@patch("yelp.persistence.url_table.URL_TABLE")
 def test_get_all_items(mock_table):
     # Given
     mock_table.scan.side_effect = (
@@ -24,7 +23,7 @@ def test_get_all_items(mock_table):
 
 
 @freeze_time("2020-08-23")
-@patch("persistence.url_table.URL_TABLE")
+@patch("yelp.persistence.url_table.URL_TABLE")
 def test_upsert_new_url(mock_table):
     # Given
     url = "https://foo.com"
@@ -42,7 +41,7 @@ def test_upsert_new_url(mock_table):
 
 
 @freeze_time("2020-08-23")
-@patch("persistence.url_table.URL_TABLE")
+@patch("yelp.persistence.url_table.URL_TABLE")
 def test_update_fetched_url(mock_table):
     # Given
     url = "https://foo.com"
@@ -59,7 +58,7 @@ def test_update_fetched_url(mock_table):
 
 
 @freeze_time("2020-08-23")
-@patch("persistence.url_table.URL_TABLE")
+@patch("yelp.persistence.url_table.URL_TABLE")
 def test_update_fetched_url_erro(mock_table):
     # Given
     url = "https://foo.com"

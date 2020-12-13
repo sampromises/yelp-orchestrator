@@ -5,7 +5,7 @@ from http import HTTPStatus
 import boto3
 from boto3.dynamodb.conditions import Key
 
-from config import YELP_TABLE_NAME
+from yelp.config import YELP_TABLE_NAME
 
 
 def get_items(user_id):
