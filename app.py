@@ -109,6 +109,14 @@ class YelpOrchestratorStack(core.Stack):
                 bisect_batch_on_error=True,
             )
         )
+        rule = aws_events.Rule(
+            self,
+            "UrlRequesterRule",
+            schedule=aws_events.Schedule.cron(
+                minute="*/5", hour="*", month="*", week_day="*", year="*"
+            ),
+        )
+        rule.add_target(aws_events_targets.LambdaFunction(url_requester))
         self.url_requester = url_requester
         return self.url_requester
 
