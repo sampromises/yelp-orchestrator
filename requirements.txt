@@ -1,3 +1,4 @@
 -e .
 
 -r lambda_dependencies/page_fetcher.txt
+-r lambda_dependencies/yelp_parser.txt
