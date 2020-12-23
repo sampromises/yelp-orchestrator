@@ -1,15 +1,19 @@
 from datetime import datetime
 from unittest.mock import Mock, patch
 
+import pytest
 from boto3.dynamodb.conditions import Key
 from freezegun import freeze_time
+from tests.util import random_string
 from yelp.persistence import yelp_table
 from yelp.persistence.yelp_table import (
+    MultipleUserIdsFoundError,
     ReviewId,
     ReviewMetadata,
     UserMetadata,
     _upsert_record,
     get_all_records,
+    get_user_id_from_review_id,
     update_review_status,
     upsert_metadata,
     upsert_review,
@@ -133,3 +137,51 @@ def test_update_review_status(mock_upsert_record):
         "set ReviewStatus=:status",
         {":status": status},
     )
+
+
+def test_get_user_id_from_review_id_exists():
+    # Given
+    user_id, review_id = random_string(), random_string()
+
+    mock_yelp_table = Mock()
+    mock_yelp_table.query.return_value = {"Items": [{"UserId": user_id}]}
+    yelp_table.YELP_TABLE = mock_yelp_table
+
+    # When
+    result = get_user_id_from_review_id(review_id)
+
+    # Then
+    assert result == user_id
+
+
+def test_get_user_id_from_review_id_doesnt_exist():
+    # Given
+    review_id = random_string()
+
+    mock_yelp_table = Mock()
+    mock_yelp_table.query.return_value = {"Items": []}
+    yelp_table.YELP_TABLE = mock_yelp_table
+
+    # When
+    result = get_user_id_from_review_id(review_id)
+
+    # Then
+    assert not result
+
+
+def test_get_user_id_from_review_id_multiple():
+    # Given
+    review_id = random_string()
+    items = [Mock(), Mock()]
+
+    mock_yelp_table = Mock()
+    mock_yelp_table.query.return_value = {"Items": items}
+    yelp_table.YELP_TABLE = mock_yelp_table
+
+    with pytest.raises(MultipleUserIdsFoundError) as e:
+        # When
+        get_user_id_from_review_id(review_id)
+
+    # Then
+    assert review_id in str(e.value)
+    assert str(items) in str(e.value)

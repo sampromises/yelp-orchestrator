@@ -8,6 +8,7 @@ from yelp.persistence.yelp_table import (
     ReviewMetadata,
     UserMetadata,
     get_all_records,
+    get_user_id_from_review_id,
     update_review_status,
     upsert_metadata,
     upsert_review,
@@ -43,9 +44,8 @@ def test_upsert_metadata():
 
         # Cleanup
         _delete_records(records)
-    except:
+    finally:
         _delete_user_id(user_id)
-        raise
 
 
 def test_upsert_review():
@@ -75,9 +75,8 @@ def test_upsert_review():
 
         # Cleanup
         _delete_records(records)
-    except:
+    finally:
         _delete_user_id(user_id)
-        raise
 
 
 def test_update_review_status():
@@ -126,9 +125,25 @@ def test_update_review_status():
 
         # Cleanup
         _delete_records(records)
-    except:
+    finally:
         _delete_user_id(user_id)
-        raise
+
+
+def test_get_user_id_from_review_id():
+    # Given
+    user_id = random_string()
+    review_id_tup = ReviewId(random_string(), random_string())
+    review_metadata = ReviewMetadata(random_string(), random_string(), random_string())
+
+    try:
+        # Upsert a review
+        upsert_review(user_id, review_id_tup, review_metadata, TEST_TTL)
+
+        # Fetch user_id from review_id
+        fetched_user_id = get_user_id_from_review_id(review_id_tup.review_id)
+        assert fetched_user_id == user_id
+    finally:
+        _delete_user_id(user_id)
 
 
 def _delete_user_id(user_id):

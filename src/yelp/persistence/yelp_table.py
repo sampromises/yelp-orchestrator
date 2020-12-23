@@ -107,3 +107,21 @@ def update_review_status(user_id, review_id: ReviewId, status):
         (f"set {_ReviewSchema.REVIEW_STATUS}=:status"),
         {":status": status},
     )
+
+
+class MultipleUserIdsFoundError(Exception):
+    pass
+
+
+def get_user_id_from_review_id(review_id: str):
+    items = YELP_TABLE.query(
+        KeyConditionExpression=Key(_ReviewSchema.REVIEW_ID).eq(review_id),
+        IndexName=_ReviewSchema.REVIEW_ID,
+    )["Items"]
+    if not items:
+        return None
+    if len(items) > 1:
+        raise MultipleUserIdsFoundError(
+            f"More than 1 UserId found for ReviewId. [{review_id=}, {items=}]"
+        )
+    return items[0][_YelpTableSchema.USER_ID]

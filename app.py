@@ -71,7 +71,7 @@ class YelpOrchestratorStack(core.Stack):
         )
 
     def create_yelp_table(self):
-        self.yelp_table = aws_dynamodb.Table(
+        yelp_table = aws_dynamodb.Table(
             self,
             YELP_TABLE_NAME,
             table_name=YELP_TABLE_NAME,
@@ -82,6 +82,13 @@ class YelpOrchestratorStack(core.Stack):
             stream=aws_dynamodb.StreamViewType.NEW_IMAGE,
             time_to_live_attribute="TimeToLive",
         )
+        yelp_table.add_global_secondary_index(
+            partition_key=aws_dynamodb.Attribute(
+                name="ReviewId", type=aws_dynamodb.AttributeType.STRING
+            ),
+            index_name="ReviewId",
+        )
+        self.yelp_table = yelp_table
 
     def create_config_table(self):
         self.config_table = aws_dynamodb.Table(
