@@ -25,6 +25,7 @@ STACK_NAME = "YelpOrchestrator"
 API_NAME = "YelpOrchestratorAPI"
 URL_TABLE_NAME = "UrlTable"
 YELP_TABLE_NAME = "YelpTable"
+CONFIG_TABLE_NAME = "ConfigTable"
 PAGE_BUCKET_NAME = "YelpOrchestratorPageBucket"
 
 
@@ -35,6 +36,7 @@ class YelpOrchestratorStack(core.Stack):
         self.create_page_bucket()
         self.create_url_table()
         self.create_yelp_table()
+        self.create_config_table()
 
         self._lambdas = (
             self.create_url_requester(),
@@ -79,6 +81,16 @@ class YelpOrchestratorStack(core.Stack):
             sort_key=aws_dynamodb.Attribute(name="SortKey", type=aws_dynamodb.AttributeType.STRING),
             stream=aws_dynamodb.StreamViewType.NEW_IMAGE,
             time_to_live_attribute="TimeToLive",
+        )
+
+    def create_config_table(self):
+        self.config_table = aws_dynamodb.Table(
+            self,
+            CONFIG_TABLE_NAME,
+            table_name=CONFIG_TABLE_NAME,
+            partition_key=aws_dynamodb.Attribute(
+                name="UserId", type=aws_dynamodb.AttributeType.STRING
+            ),
         )
 
     def create_url_requester(self):
@@ -173,6 +185,7 @@ class YelpOrchestratorStack(core.Stack):
         env_vars_to_add = {
             "YELP_TABLE_NAME": self.yelp_table.table_name,
             "URL_TABLE_NAME": self.url_table.table_name,
+            "CONFIG_TABLE_NAME": self.config_table.table_name,
             "PAGE_BUCKET_NAME": self.page_bucket.bucket_name,
             "YELP_USER_ID": YELP_USER_ID,
             "FETCH_BATCH_SIZE": FETCH_BATCH_SIZE,
