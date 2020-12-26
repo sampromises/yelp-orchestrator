@@ -19,7 +19,7 @@ def test_upserting_new_user_ids():
 
         # Then
         fetched_user_ids = get_all_user_ids()
-        assert set(user_ids) == set(fetched_user_ids)
+        assert set(user_ids).issubset(set(fetched_user_ids))
     finally:
         # Cleanup
         _delete_user_ids(*user_ids)
