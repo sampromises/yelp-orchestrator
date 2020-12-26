@@ -2,13 +2,13 @@ import requests
 
 from yelp.config import FETCH_BATCH_SIZE
 from yelp.persistence.page_bucket import upload_page
-from yelp.persistence.url_table import get_all_url_items, update_fetched_url
+from yelp.persistence.url_table import UrlTableSchema, get_all_url_items, update_fetched_url
 
 
 def gather_batch():
     all_items = get_all_url_items()
     ok_items = filter(lambda item: not item.get("ErrorMessage"), all_items)
-    sorted_items = sorted(ok_items, key=lambda x: x.get("Date") or 0)
+    sorted_items = sorted(ok_items, key=lambda x: x.get(UrlTableSchema.LAST_FETCHED, 0))
     return sorted_items[:FETCH_BATCH_SIZE]
 
 

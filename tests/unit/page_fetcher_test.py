@@ -11,11 +11,11 @@ def test_gather_batch(mock_get_all_url_items):
     mock_get_all_url_items.return_value = [
         {"Url": "SKIPPED", "ErrorMessage": "Error!"},
         {"Url": "0"},
-        {"Url": "1", "Date": 1},
-        {"Url": "2", "Date": 2},
-        {"Url": "3", "Date": 3},
-        {"Url": "4", "Date": 4},
-        {"Url": "5", "Date": 5},
+        {"Url": "1", "LastFetched": 1},
+        {"Url": "2", "LastFetched": 2},
+        {"Url": "3", "LastFetched": 3},
+        {"Url": "4", "LastFetched": 4},
+        {"Url": "5", "LastFetched": 5},
     ]
     page_fetcher.FETCH_BATCH_SIZE = 3
 
@@ -25,8 +25,8 @@ def test_gather_batch(mock_get_all_url_items):
     # Then
     assert batch == [
         {"Url": "0"},
-        {"Url": "1", "Date": 1},
-        {"Url": "2", "Date": 2},
+        {"Url": "1", "LastFetched": 1},
+        {"Url": "2", "LastFetched": 2},
     ]
 
 
