@@ -16,7 +16,6 @@ from aws_cdk import (
     core,
 )
 
-YELP_USER_ID = os.environ["YELP_USER_ID"]
 FETCH_BATCH_SIZE = os.environ["FETCH_BATCH_SIZE"]
 URL_TABLE_TTL = os.environ["URL_TABLE_TTL"]
 YELP_TABLE_TTL = os.environ["YELP_TABLE_TTL"]
@@ -102,7 +101,6 @@ class YelpOrchestratorStack(core.Stack):
 
     def create_url_requester(self):
         url_requester = self.create_lambda("url_requester")
-        url_requester.add_environment("YELP_USER_ID", YELP_USER_ID)
         url_requester.add_event_source(
             aws_lambda_event_sources.DynamoEventSource(
                 self.yelp_table,
@@ -194,7 +192,6 @@ class YelpOrchestratorStack(core.Stack):
             "URL_TABLE_NAME": self.url_table.table_name,
             "CONFIG_TABLE_NAME": self.config_table.table_name,
             "PAGE_BUCKET_NAME": self.page_bucket.bucket_name,
-            "YELP_USER_ID": YELP_USER_ID,
             "FETCH_BATCH_SIZE": FETCH_BATCH_SIZE,
             "URL_TABLE_TTL": URL_TABLE_TTL,
             "YELP_TABLE_TTL": YELP_TABLE_TTL,

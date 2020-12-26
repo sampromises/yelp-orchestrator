@@ -6,7 +6,6 @@ import requests
 from tests.util import random_string
 
 URL = os.environ["APIGATEWAY_URL"]
-YELP_USER_ID = os.environ["YELP_USER_ID"]
 YELP_TABLE_NAME = os.environ["YELP_TABLE_NAME"]
 
 
