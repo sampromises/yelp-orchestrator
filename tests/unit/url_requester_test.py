@@ -6,7 +6,7 @@ from yelp.url_requester import (
     _create_review_status_url,
     _create_user_metadata_url,
     _create_user_review_pages_urls,
-    _parse_ddb_stream,
+    _parse_ddb_record,
     handle,
 )
 
@@ -66,89 +66,37 @@ def test_create_review_status_url(mock_upsert_new_url):
     )
 
 
-def test_parse_ddb_stream():
+def test_parse_ddb_record():
     # Given
-    event = {
-        "Records": [
-            {
-                "eventName": "INSERT",
-                "dynamodb": {
-                    "Keys": {"UserId": {"S": "OPBdTgFkXkyTfAnzAIFr"}, "SortKey": {"S": "Metadata"}},
-                    "NewImage": {
-                        "TimeToLive": {"N": "1608949569"},
-                        "UserName": {"S": "qnYvIxzJbcuMCdhMSyBs"},
-                        "UserId": {"S": "OPBdTgFkXkyTfAnzAIFr"},
-                        "SortKey": {"S": "Metadata"},
-                        "City": {"S": "huMyUJsIAOUmRIQAdGds"},
-                        "LastUpdated": {"N": "1608948569"},
-                        "ReviewCount": {"N": "57"},
-                    },
-                },
+    event_record = {
+        "eventName": "INSERT",
+        "dynamodb": {
+            "Keys": {"UserId": {"S": "OPBdTgFkXkyTfAnzAIFr"}, "SortKey": {"S": "Metadata"}},
+            "NewImage": {
+                "TimeToLive": {"N": "1608949569"},
+                "UserName": {"S": "qnYvIxzJbcuMCdhMSyBs"},
+                "UserId": {"S": "OPBdTgFkXkyTfAnzAIFr"},
+                "SortKey": {"S": "Metadata"},
+                "City": {"S": "huMyUJsIAOUmRIQAdGds"},
+                "LastUpdated": {"N": "1608948569"},
+                "ReviewCount": {"N": "57"},
             },
-            {
-                "eventName": "REMOVE",
-                "dynamodb": {
-                    "Keys": {"UserId": {"S": "OPBdTgFkXkyTfAnzAIFr"}, "SortKey": {"S": "Metadata"}},
-                },
-            },
-            {
-                "eventName": "INSERT",
-                "dynamodb": {
-                    "Keys": {
-                        "UserId": {"S": "wpOJlCdBneHmozPVoNZI"},
-                        "SortKey": {"S": "Review#WvyGaSiHJhfoYsgDVtOL"},
-                    },
-                    "NewImage": {
-                        "BizAddress": {"S": "OFsGCKmAbEjXGbijXwbU"},
-                        "ReviewDate": {"S": "eqqWkDdLeHxOfSoBmLhj"},
-                        "TimeToLive": {"N": "1608949570"},
-                        "UserId": {"S": "wpOJlCdBneHmozPVoNZI"},
-                        "BizName": {"S": "ChSsPJenxLdLSBoBjgKf"},
-                        "SortKey": {"S": "Review#WvyGaSiHJhfoYsgDVtOL"},
-                        "LastUpdated": {"N": "1608948570"},
-                        "ReviewId": {"S": "NhekAcdfldDzLzlzereZ"},
-                        "BizId": {"S": "WvyGaSiHJhfoYsgDVtOL"},
-                    },
-                },
-            },
-            {
-                "eventName": "REMOVE",
-                "dynamodb": {
-                    "Keys": {
-                        "UserId": {"S": "wpOJlCdBneHmozPVoNZI"},
-                        "SortKey": {"S": "Review#WvyGaSiHJhfoYsgDVtOL"},
-                    },
-                },
-            },
-        ]
+        },
     }
 
     # When
-    result = _parse_ddb_stream(event)
+    result = _parse_ddb_record(event_record)
 
     # Then
-    assert result == [
-        {
-            "City": "huMyUJsIAOUmRIQAdGds",
-            "LastUpdated": Decimal("1608948569"),
-            "ReviewCount": Decimal("57"),
-            "SortKey": "Metadata",
-            "TimeToLive": Decimal("1608949569"),
-            "UserId": "OPBdTgFkXkyTfAnzAIFr",
-            "UserName": "qnYvIxzJbcuMCdhMSyBs",
-        },
-        {
-            "BizAddress": "OFsGCKmAbEjXGbijXwbU",
-            "BizId": "WvyGaSiHJhfoYsgDVtOL",
-            "BizName": "ChSsPJenxLdLSBoBjgKf",
-            "LastUpdated": Decimal("1608948570"),
-            "ReviewDate": "eqqWkDdLeHxOfSoBmLhj",
-            "ReviewId": "NhekAcdfldDzLzlzereZ",
-            "SortKey": "Review#WvyGaSiHJhfoYsgDVtOL",
-            "TimeToLive": Decimal("1608949570"),
-            "UserId": "wpOJlCdBneHmozPVoNZI",
-        },
-    ]
+    assert result == {
+        "City": "huMyUJsIAOUmRIQAdGds",
+        "LastUpdated": Decimal("1608948569"),
+        "ReviewCount": Decimal("57"),
+        "SortKey": "Metadata",
+        "TimeToLive": Decimal("1608949569"),
+        "UserId": "OPBdTgFkXkyTfAnzAIFr",
+        "UserName": "qnYvIxzJbcuMCdhMSyBs",
+    }
 
 
 @patch("yelp.url_requester._create_review_status_url")
@@ -214,6 +162,7 @@ def test_handle_yelp_table_event(mock_create_user_review_pages_urls, mock_create
                         "ReviewCount": {"N": "57"},
                     },
                 },
+                "eventSourceARN": "arn:aws:dynamodb:us-west-1:123456789012:table/YelpTable/stream/2015-06-27T00:48:05.899",
             },
             {
                 "eventName": "INSERT",
@@ -234,6 +183,7 @@ def test_handle_yelp_table_event(mock_create_user_review_pages_urls, mock_create
                         "BizId": {"S": "WvyGaSiHJhfoYsgDVtOL"},
                     },
                 },
+                "eventSourceARN": "arn:aws:dynamodb:us-west-1:123456789012:table/YelpTable/stream/2015-06-27T00:48:05.899",
             },
         ]
     }
@@ -265,4 +215,29 @@ def test_handle_yelp_table_event(mock_create_user_review_pages_urls, mock_create
             "ReviewId": "NhekAcdfldDzLzlzereZ",
             "BizId": "WvyGaSiHJhfoYsgDVtOL",
         }
+    )
+
+
+@patch("yelp.url_requester.upsert_new_url")
+def test_handle_config_table_event(mock_upsert_new_url):
+    # Given
+    user_id = random_string()
+    event = {
+        "Records": [
+            {
+                "eventName": "INSERT",
+                "dynamodb": {
+                    "NewImage": {"UserId": {"S": user_id}},
+                },
+                "eventSourceARN": "arn:aws:dynamodb:us-west-1:316936913708:table/ConfigTable/stream/2020-12-26T06:39:42.594",
+            }
+        ]
+    }
+
+    # When
+    handle(event)
+
+    # Then
+    mock_upsert_new_url.assert_called_once_with(
+        f"https://www.yelp.com/user_details?userid={user_id}"
     )

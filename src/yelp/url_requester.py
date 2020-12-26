@@ -3,7 +3,8 @@ from typing import Dict
 
 import boto3
 
-from yelp.persistence.config_table import get_all_user_ids
+from yelp.config import CONFIG_TABLE_NAME, YELP_TABLE_NAME
+from yelp.persistence.config_table import ConfigTableSchema, get_all_user_ids
 from yelp.persistence.url_table import upsert_new_url
 from yelp.persistence.yelp_table import (
     _MetadataSchema,
@@ -53,28 +54,38 @@ def handle_cron_event():
                 _create_review_status_url(record)
 
 
-def _parse_ddb_stream(event):
-    upsert_records = filter(
-        lambda record: record["eventName"] in ("INSERT", "MODIFY"), event["Records"]
-    )
-    ddb_records = map(lambda record: record["dynamodb"]["NewImage"], upsert_records)
-    return list(
-        map(
-            lambda data: {k: DDB_TYPE_DESERIALIZER.deserialize(v) for k, v in data.items()},
-            ddb_records,
-        )
-    )
+def _parse_ddb_record(record):
+    return {
+        k: DDB_TYPE_DESERIALIZER.deserialize(v) for k, v in record["dynamodb"]["NewImage"].items()
+    }
 
 
-def handle_yelp_table_event(event):
+def handle_config_table_record(ddb_record):
+    _create_user_metadata_url(ddb_record[ConfigTableSchema.USER_ID])
+
+
+def handle_yelp_table_record(ddb_record):
+    if ddb_record["SortKey"] == _MetadataSchema.SORT_KEY_VALUE:
+        _create_user_review_pages_urls(ddb_record)
+    elif ddb_record["SortKey"].startswith(_ReviewSchema.SORT_KEY_VALUE):
+        _create_review_status_url(ddb_record)
+
+
+def handle_ddb_event(event):
     errors = []
-    for record in _parse_ddb_stream(event):
-        print(f"Processing record: {record}")
+    for event_record in event["Records"]:
+        if event_record["eventName"] == "REMOVE":
+            continue
+
         try:
-            if record["SortKey"] == _MetadataSchema.SORT_KEY_VALUE:
-                _create_user_review_pages_urls(record)
-            elif record["SortKey"].startswith(_ReviewSchema.SORT_KEY_VALUE):
-                _create_review_status_url(record)
+            ddb_record = _parse_ddb_record(event_record)
+            print(f"Processing DDB record: {event_record}")
+
+            if CONFIG_TABLE_NAME in event_record["eventSourceARN"]:
+                handle_config_table_record(ddb_record)
+            if YELP_TABLE_NAME in event_record["eventSourceARN"]:
+                handle_yelp_table_record(ddb_record)
+
         except Exception as e:
             traceback.print_exc()
             errors.append(e)
@@ -89,5 +100,5 @@ def handle(event, context=None):
     if event.get("source") == "aws.events":
         handle_cron_event()
     elif event.get("Records"):
-        handle_yelp_table_event(event)
+        handle_ddb_event(event)
     return {"statusCode": 200}

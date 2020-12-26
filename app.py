@@ -97,6 +97,7 @@ class YelpOrchestratorStack(core.Stack):
             partition_key=aws_dynamodb.Attribute(
                 name="UserId", type=aws_dynamodb.AttributeType.STRING
             ),
+            stream=aws_dynamodb.StreamViewType.NEW_IMAGE,
         )
 
     def create_url_requester(self):
@@ -104,6 +105,14 @@ class YelpOrchestratorStack(core.Stack):
         url_requester.add_event_source(
             aws_lambda_event_sources.DynamoEventSource(
                 self.yelp_table,
+                starting_position=aws_lambda.StartingPosition.TRIM_HORIZON,
+                batch_size=5,
+                bisect_batch_on_error=True,
+            )
+        )
+        url_requester.add_event_source(
+            aws_lambda_event_sources.DynamoEventSource(
+                self.config_table,
                 starting_position=aws_lambda.StartingPosition.TRIM_HORIZON,
                 batch_size=5,
                 bisect_batch_on_error=True,
