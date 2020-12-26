@@ -9,13 +9,12 @@ from yelp.page_fetcher import gather_batch, process_item
 def test_gather_batch(mock_get_all_url_items):
     # Given
     mock_get_all_url_items.return_value = [
-        {"Url": "SKIPPED", "ErrorMessage": "Error!"},
         {"Url": "0"},
         {"Url": "1", "LastFetched": 1},
         {"Url": "2", "LastFetched": 2},
         {"Url": "3", "LastFetched": 3},
         {"Url": "4", "LastFetched": 4},
-        {"Url": "5", "LastFetched": 5},
+        {"Url": "5", "LastFetched": 5, "ErrorMessage": "Error!"},
     ]
     page_fetcher.FETCH_BATCH_SIZE = 3
 

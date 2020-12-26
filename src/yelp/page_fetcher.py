@@ -6,9 +6,7 @@ from yelp.persistence.url_table import UrlTableSchema, get_all_url_items, update
 
 
 def gather_batch():
-    all_items = get_all_url_items()
-    ok_items = filter(lambda item: not item.get("ErrorMessage"), all_items)
-    sorted_items = sorted(ok_items, key=lambda x: x.get(UrlTableSchema.LAST_FETCHED, 0))
+    sorted_items = sorted(get_all_url_items(), key=lambda x: x.get(UrlTableSchema.LAST_FETCHED, 0))
     return sorted_items[:FETCH_BATCH_SIZE]
 
 
