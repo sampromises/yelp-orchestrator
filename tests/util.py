@@ -3,6 +3,8 @@ import random
 import string
 import time
 
+TEST_PREFIX = "TEST_"
+
 
 def random_int(limit=100):
     return random.choice(range(limit))
@@ -10,7 +12,7 @@ def random_int(limit=100):
 
 def random_string(length=20):
     letters = string.ascii_letters
-    return "".join(random.choice(letters) for i in range(length))
+    return TEST_PREFIX + "".join(random.choice(letters) for _ in range(length))
 
 
 def get_test_dir():
