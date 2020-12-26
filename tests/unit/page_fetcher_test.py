@@ -1,5 +1,6 @@
 from unittest.mock import Mock, patch
 
+import pytest
 from freezegun import freeze_time
 from yelp import page_fetcher
 from yelp.page_fetcher import gather_batch, process_item
@@ -9,12 +10,12 @@ from yelp.page_fetcher import gather_batch, process_item
 def test_gather_batch(mock_get_all_url_items):
     # Given
     mock_get_all_url_items.return_value = [
-        {"Url": "0"},
-        {"Url": "1", "LastFetched": 1},
-        {"Url": "2", "LastFetched": 2},
-        {"Url": "3", "LastFetched": 3},
-        {"Url": "4", "LastFetched": 4},
-        {"Url": "5", "LastFetched": 5, "ErrorMessage": "Error!"},
+        {"PageUrl": "0"},
+        {"PageUrl": "1", "LastFetched": 1},
+        {"PageUrl": "2", "LastFetched": 2},
+        {"PageUrl": "3", "LastFetched": 3},
+        {"PageUrl": "4", "LastFetched": 4},
+        {"PageUrl": "5", "LastFetched": 5, "ErrorMessage": "Error!"},
     ]
     page_fetcher.FETCH_BATCH_SIZE = 3
 
@@ -23,9 +24,9 @@ def test_gather_batch(mock_get_all_url_items):
 
     # Then
     assert batch == [
-        {"Url": "0"},
-        {"Url": "1", "LastFetched": 1},
-        {"Url": "2", "LastFetched": 2},
+        {"PageUrl": "0"},
+        {"PageUrl": "1", "LastFetched": 1},
+        {"PageUrl": "2", "LastFetched": 2},
     ]
 
 
@@ -43,12 +44,12 @@ def test_process_item_success(mock_requests, mock_update_fetched_url, mock_uploa
     mock_requests.get.return_value = mock_response
 
     # When
-    process_item({"Url": url})
+    process_item({"PageUrl": url})
 
     # Then
     mock_requests.get.assert_called_once_with(url)
     mock_upload_page.assert_called_once_with(url, "content")
-    mock_update_fetched_url.assert_called_once_with(url)
+    mock_update_fetched_url.assert_called_once_with(url, 200)
 
 
 @freeze_time("2020-08-23")
@@ -64,12 +65,11 @@ def test_process_item_error(mock_requests, mock_update_fetched_url, mock_upload_
     mock_response.text = "text"
     mock_requests.get.return_value = mock_response
 
-    # When
-    process_item({"Url": url})
+    with pytest.raises(Exception):
+        # When
+        process_item({"PageUrl": url})
 
-    # Then
-    mock_requests.get.assert_called_once_with(url)
-    mock_upload_page.assert_not_called()
-    mock_update_fetched_url.assert_called_once_with(
-        url, "Fetch error. [status_code=404, text=text]"
-    )
+        # Then
+        mock_requests.get.assert_called_once_with(url)
+        mock_upload_page.assert_not_called()
+        mock_update_fetched_url.assert_called_once_with(url, 404)

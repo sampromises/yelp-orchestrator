@@ -2,7 +2,7 @@ from datetime import datetime
 from unittest.mock import patch
 
 from freezegun import freeze_time
-from yelp.persistence import url_table
+from tests.util import random_string
 from yelp.persistence.url_table import get_all_url_items, update_fetched_url, upsert_new_url
 
 
@@ -26,53 +26,44 @@ def test_get_all_items(mock_table):
 @patch("yelp.persistence.url_table.URL_TABLE")
 def test_upsert_new_url(mock_table):
     # Given
+    user_id = random_string()
     url = "https://foo.com"
     ttl = 24
 
     # When
-    upsert_new_url(url, ttl)
+    upsert_new_url(user_id, url, ttl)
 
     # Then
     mock_table.update_item.assert_called_once_with(
-        Key={"Url": url},
+        Key={"UserId": user_id, "PageUrl": url},
         UpdateExpression="set TimeToLive=:ttl",
-        ExpressionAttributeValues={":ttl": int(datetime(2020, 8, 23).timestamp()) + ttl},
-    )
-
-
-@freeze_time("2020-08-23")
-@patch("yelp.persistence.url_table.URL_TABLE")
-def test_update_fetched_url(mock_table):
-    # Given
-    url = "https://foo.com"
-
-    # When
-    update_fetched_url(url)
-
-    # Then
-    mock_table.update_item.assert_called_once_with(
-        Key={"Url": url},
-        UpdateExpression="set LastFetched=:last_fetched",
-        ExpressionAttributeValues={":last_fetched": int(datetime(2020, 8, 23).timestamp())},
-    )
-
-
-@freeze_time("2020-08-23")
-@patch("yelp.persistence.url_table.URL_TABLE")
-def test_update_fetched_url_erro(mock_table):
-    # Given
-    url = "https://foo.com"
-    error = "test-error-message"
-
-    # When
-    update_fetched_url(url, error)
-
-    # Then
-    mock_table.update_item.assert_called_once_with(
-        Key={"Url": url},
-        UpdateExpression="set LastFetched=:last_fetched, ErrorMessage=:error",
         ExpressionAttributeValues={
+            ":ttl": int(datetime(2020, 8, 23).timestamp()) + ttl,
+        },
+    )
+
+
+@freeze_time("2020-08-23")
+@patch("yelp.persistence.url_table.get_user_id_from_url")
+@patch("yelp.persistence.url_table.URL_TABLE")
+def test_update_fetched_url(mock_table, mock_get_user_id_from_url):
+    # Given
+    url = "https://foo.com"
+    status_code = 42
+
+    user_id = random_string()
+    mock_get_user_id_from_url.return_value = user_id
+
+    # When
+    update_fetched_url(url, status_code)
+
+    # Then
+    mock_get_user_id_from_url.assert_called_once_with(url)
+    mock_table.update_item.assert_called_once_with(
+        Key={"UserId": user_id, "PageUrl": url},
+        UpdateExpression="set StatusCode=:status_code, LastFetched=:last_fetched",
+        ExpressionAttributeValues={
+            ":status_code": status_code,
             ":last_fetched": int(datetime(2020, 8, 23).timestamp()),
-            ":error": error,
         },
     )

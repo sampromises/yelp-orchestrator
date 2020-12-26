@@ -13,7 +13,7 @@ def gather_batch():
 
 
 def process_item(item):
-    url = item["Url"]
+    url = item[UrlTableSchema.URL]
     print(f"Processing item. [{url=}]")
     try:
         # Fetch HTML
@@ -25,9 +25,9 @@ def process_item(item):
             raise Exception(f"Fetch error. [status_code={resp.status_code}, text={resp.text}]")
 
         upload_page(url, resp.content)
+        update_fetched_url(url, resp.status_code)
+    except:
         update_fetched_url(url)
-    except Exception as err:
-        update_fetched_url(url, str(err))
         raise
 
 

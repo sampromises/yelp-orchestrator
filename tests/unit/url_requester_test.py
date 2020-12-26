@@ -21,7 +21,7 @@ def test_create_user_metadata_url(mock_upsert_new_url):
 
     # Then
     mock_upsert_new_url.assert_called_once_with(
-        f"https://www.yelp.com/user_details?userid={user_id}"
+        user_id, f"https://www.yelp.com/user_details?userid={user_id}"
     )
 
 
@@ -39,30 +39,37 @@ def test_create_user_review_pages_urls(mock_upsert_new_url):
     mock_upsert_new_url.assert_has_calls(
         [
             call(
-                f"https://www.yelp.com/user_details_reviews_self?userid={user_id}&rec_pagestart=0"
+                user_id,
+                f"https://www.yelp.com/user_details_reviews_self?userid={user_id}&rec_pagestart=0",
             ),
             call(
-                f"https://www.yelp.com/user_details_reviews_self?userid={user_id}&rec_pagestart=10"
+                user_id,
+                f"https://www.yelp.com/user_details_reviews_self?userid={user_id}&rec_pagestart=10",
             ),
             call(
-                f"https://www.yelp.com/user_details_reviews_self?userid={user_id}&rec_pagestart=20"
+                user_id,
+                f"https://www.yelp.com/user_details_reviews_self?userid={user_id}&rec_pagestart=20",
             ),
         ]
     )
 
 
+@patch("yelp.url_requester.get_user_id_from_review_id")
 @patch("yelp.url_requester.upsert_new_url")
-def test_create_review_status_url(mock_upsert_new_url):
+def test_create_review_status_url(mock_upsert_new_url, mock_get_user_id_from_review_id):
     # Given
     biz_id, review_id = random_string(), random_string()
     review_record = {"BizId": biz_id, "ReviewId": review_id}
+
+    user_id = random_string()
+    mock_get_user_id_from_review_id.return_value = user_id
 
     # When
     _create_review_status_url(review_record)
 
     # Then
     mock_upsert_new_url.assert_called_once_with(
-        f"https://www.yelp.com/biz/{biz_id}?hrid={review_id}"
+        user_id, f"https://www.yelp.com/biz/{biz_id}?hrid={review_id}"
     )
 
 
@@ -239,5 +246,5 @@ def test_handle_config_table_event(mock_upsert_new_url):
 
     # Then
     mock_upsert_new_url.assert_called_once_with(
-        f"https://www.yelp.com/user_details?userid={user_id}"
+        user_id, f"https://www.yelp.com/user_details?userid={user_id}"
     )

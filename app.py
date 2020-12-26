@@ -59,15 +59,23 @@ class YelpOrchestratorStack(core.Stack):
         )
 
     def create_url_table(self):
-        self.url_table = aws_dynamodb.Table(
+        url_table = aws_dynamodb.Table(
             self,
             URL_TABLE_NAME,
             table_name=URL_TABLE_NAME,
             partition_key=aws_dynamodb.Attribute(
-                name="Url", type=aws_dynamodb.AttributeType.STRING
+                name="UserId", type=aws_dynamodb.AttributeType.STRING
             ),
+            sort_key=aws_dynamodb.Attribute(name="PageUrl", type=aws_dynamodb.AttributeType.STRING),
             time_to_live_attribute="TimeToLive",
         )
+        url_table.add_global_secondary_index(
+            partition_key=aws_dynamodb.Attribute(
+                name="PageUrl", type=aws_dynamodb.AttributeType.STRING
+            ),
+            index_name="PageUrl",
+        )
+        self.url_table = url_table
 
     def create_yelp_table(self):
         yelp_table = aws_dynamodb.Table(
