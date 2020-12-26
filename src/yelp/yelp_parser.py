@@ -1,7 +1,6 @@
 import traceback
 from urllib.parse import unquote_plus
 
-from yelp.config import YELP_USER_ID
 from yelp.parser.base_parser import BaseParser
 from yelp.parser.review_status_parser import ReviewStatusParser
 from yelp.parser.reviews_page_parser import ReviewsPageParser
@@ -34,10 +33,10 @@ def parse_key(record):
 def process_record(record):
     key = parse_key(record)
     url = KeyUtils.from_key(key)
-    print(f"Processing record. [{key=}, {url=}]")
-    page = download_page(url)
     if parser_cls := get_parser(url):
-        parser_cls(YELP_USER_ID).process(url, page)
+        print(f"Processing record. [{key=}, {url=}]")
+        page = download_page(url)
+        parser_cls().process(url, page)
 
 
 def handle(event, context=None):

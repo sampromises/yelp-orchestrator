@@ -1,9 +1,9 @@
-from unittest.mock import call, patch
+from unittest.mock import patch
 
 from tests.util import get_file
 from yelp.parser.review_status_parser import ParsedReviewStatus, ReviewStatusParser
 from yelp.parser.util import to_soup
-from yelp.persistence.yelp_table import ReviewId, ReviewMetadata
+from yelp.persistence.yelp_table import ReviewId
 
 
 def test_parse():
@@ -13,7 +13,7 @@ def test_parse():
     )
 
     # When
-    result = ReviewStatusParser("").parse(
+    result = ReviewStatusParser().parse(
         "https://yelp.com/biz/las-galas-los-angeles?hrid=q2pionpcY_-WZPwSWelTFw", soup
     )
 
@@ -35,7 +35,7 @@ def test_parse_dead():
     )
 
     # When
-    result = ReviewStatusParser("").parse(
+    result = ReviewStatusParser().parse(
         "https://yelp.com/biz/thanh-son-tofu-garden-grove-3?hrid=OcEneH8BXu1z8-fpFFyrAg",
         soup,
     )
@@ -49,10 +49,10 @@ def test_parse_dead():
     )
 
 
+@patch("yelp.parser.review_status_parser.get_user_id_from_review_id")
 @patch("yelp.parser.review_status_parser.update_review_status")
-def test_write_result(mock_upsert_review):
+def test_write_result(mock_upsert_review, mock_get_user_id_from_review_id):
     # Given
-    user_id = "test-user-id"
     review_id_tuple = ReviewId(biz_id="test-biz-id", review_id="test-review-id")
     is_alive = True
     result = ParsedReviewStatus(
@@ -60,9 +60,12 @@ def test_write_result(mock_upsert_review):
         is_alive=is_alive,
     )
 
+    user_id = "test-user-id"
+    mock_get_user_id_from_review_id.return_value = user_id
+
     # When
-    parser = ReviewStatusParser(user_id)
-    parser.write_result(result)
+    parser = ReviewStatusParser()
+    parser.write_result("", result)
 
     # Then
     mock_upsert_review.assert_called_once_with(

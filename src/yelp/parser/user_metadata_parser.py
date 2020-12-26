@@ -22,9 +22,9 @@ class UserMetadataParser(BaseParser):
             review_count=UserMetadataParser.get_review_count(soup),
         )
 
-    def write_result(self, result: ParsedUserMetadata):
+    def write_result(self, url, result: ParsedUserMetadata):
         upsert_metadata(
-            user_id=self.user_id,
+            user_id=UserMetadataParser.get_user_id_from_url(url),
             user_metadata=UserMetadata(
                 name=result.name, city=result.city, review_count=result.review_count
             ),
@@ -42,3 +42,7 @@ class UserMetadataParser(BaseParser):
     def get_review_count(soup: BeautifulSoup) -> int:
         text = get_element_by_classname(soup, "review-count").text
         return int(re.search(r"([0-9]+)", text).group())
+
+    @staticmethod
+    def get_user_id_from_url(url: str) -> str:
+        return re.search(r"userid=([A-Za-z0-9-_]+)[\?&]?", url).group(1)

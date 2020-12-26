@@ -11,7 +11,7 @@ def test_parse():
     soup = to_soup(get_file("unit/resources/user_details/5prk8CtPPBHNpa6BOja2ug.html"))
 
     # When
-    result = UserMetadataParser("").parse("", soup)
+    result = UserMetadataParser().parse("", soup)
 
     # Then
     assert result == ParsedUserMetadata("Samuelze K.", "Palos Verdes Estates, CA", 148)
@@ -21,11 +21,12 @@ def test_parse():
 def test_write_result(mock_upsert_metadata):
     # Given
     user_id = "test-user-id"
+    url = f"https://www.yelp.com/user_details?userid={user_id}"
     result = ParsedUserMetadata("test-name", "test-city", 24)
 
     # When
-    parser = UserMetadataParser(user_id)
-    parser.write_result(result)
+    parser = UserMetadataParser()
+    parser.write_result(url, result)
 
     # Then
     mock_upsert_metadata.assert_called_once_with(

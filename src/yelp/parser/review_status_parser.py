@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
 from yelp.parser.base_parser import BaseParser, ParsedResult
-from yelp.persistence.yelp_table import ReviewId, update_review_status
+from yelp.persistence.yelp_table import ReviewId, get_user_id_from_review_id, update_review_status
 
 
 @dataclass
@@ -22,9 +22,11 @@ class ReviewStatusParser(BaseParser):
             is_alive=is_alive,
         )
 
-    def write_result(self, result: ParsedReviewStatus):
+    def write_result(self, _, result: ParsedReviewStatus):
         update_review_status(
-            user_id=self.user_id, review_id=result.review_id_tuple, status=result.is_alive
+            user_id=get_user_id_from_review_id(result.review_id_tuple.review_id),
+            review_id=result.review_id_tuple,
+            status=result.is_alive,
         )
 
     @staticmethod

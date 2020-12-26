@@ -17,7 +17,7 @@ def test_parse():
     )
 
     # When
-    result = ReviewsPageParser("").parse("", soup)
+    result = ReviewsPageParser().parse("", soup)
 
     # Then
     assert result.reviews == [
@@ -84,6 +84,7 @@ def test_parse():
 def test_write_result(mock_upsert_review):
     # Given
     user_id = "test-user-id"
+    url = f"https://www.yelp.com/user_details_reviews_self?userid={user_id}"
     result = ParsedReviewsPage(
         [
             ParsedReviewMetadata(
@@ -104,8 +105,8 @@ def test_write_result(mock_upsert_review):
     )
 
     # When
-    parser = ReviewsPageParser(user_id)
-    parser.write_result(result)
+    parser = ReviewsPageParser()
+    parser.write_result(url, result)
 
     # Then
     mock_upsert_review.assert_has_calls(

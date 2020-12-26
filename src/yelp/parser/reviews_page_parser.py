@@ -26,10 +26,10 @@ class ReviewsPageParser(BaseParser):
     def parse(self, _, soup: BeautifulSoup) -> ParsedResult:
         return ParsedReviewsPage(reviews=ReviewsPageParser.get_user_biz_reviews(soup))
 
-    def write_result(self, result: ParsedResult):
+    def write_result(self, url, result: ParsedResult):
         for scraped in result.reviews:
             upsert_review(
-                user_id=self.user_id,
+                user_id=ReviewsPageParser.get_user_id_from_url(url),
                 review_id=ReviewId(biz_id=scraped.biz_id, review_id=scraped.review_id),
                 review_metadata=ReviewMetadata(
                     biz_name=scraped.biz_name,
@@ -72,3 +72,7 @@ class ReviewsPageParser(BaseParser):
         tups = zip(biz_ids, biz_names, biz_addresses, review_ids, review_dates)
         scraped_reviews = list(map(lambda tup: ParsedReviewMetadata(*tup), tups))
         return scraped_reviews
+
+    @staticmethod
+    def get_user_id_from_url(url: str) -> str:
+        return re.search(r"userid=([A-Za-z0-9-_]+)[\?&]?", url).group(1)
