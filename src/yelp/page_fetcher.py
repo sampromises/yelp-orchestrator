@@ -1,3 +1,5 @@
+import traceback
+
 import requests
 
 from yelp.config import FETCH_BATCH_SIZE
@@ -26,6 +28,7 @@ def process_item(item):
         update_fetched_url(url)
     except Exception as err:
         update_fetched_url(url, str(err))
+        raise
 
 
 def handle(event, context=None):
@@ -34,7 +37,17 @@ def handle(event, context=None):
     items = gather_batch()
     print(f"Gathered batch:\n{items}")
 
+    errors = []
     for item in items:
-        process_item(item)
+        try:
+            process_item(item)
+        except Exception as err:
+            errors.append(err)
+            traceback.print_exc()
+
+    if errors:
+        raise Exception(
+            f"Encountered {len(errors)} total error(s) during processing. See execution log for errors."
+        )
 
     return {"statusCode": 200}
