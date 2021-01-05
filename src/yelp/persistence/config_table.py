@@ -24,3 +24,7 @@ def get_all_user_ids():
         response = CONFIG_TABLE.scan(ExclusiveStartKey=response["LastEvaluatedKey"])
         items += response["Items"]
     return list(map(lambda item: item[ConfigTableSchema.USER_ID], items))
+
+
+def delete_user_id(user_id):
+    CONFIG_TABLE.delete_item(Key={ConfigTableSchema.USER_ID: user_id})

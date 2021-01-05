@@ -37,3 +37,33 @@ def test_handle_get(_, mock_items_to_response):
 
     # Then
     assert result == {"statusCode": 200, "body": '{"foo": "bar", "biz": 42}'}
+
+
+@patch("yelp.apig_handler.upsert_user_id")
+def test_handle_post(mock_upsert_user_id):
+    # Given
+    user_id = random_string()
+
+    # When
+    result = handle({"httpMethod": "POST", "queryStringParameters": {"userId": user_id}})
+
+    # Then
+    mock_upsert_user_id.assert_called_once_with(user_id)
+    assert result == {"statusCode": 200}
+
+
+@patch("yelp.apig_handler.yelp_table")
+@patch("yelp.apig_handler.url_table")
+@patch("yelp.apig_handler.config_table")
+def test_handle_delete(mock_config_table, mock_url_table, mock_yelp_table):
+    # Given
+    user_id = random_string()
+
+    # When
+    result = handle({"httpMethod": "DELETE", "queryStringParameters": {"userId": user_id}})
+
+    # Then
+    mock_config_table.delete_user_id.assert_called_once_with(user_id)
+    mock_url_table.delete_user_id.assert_called_once_with(user_id)
+    mock_yelp_table.delete_user_id.assert_called_once_with(user_id)
+    assert result == {"statusCode": 200}

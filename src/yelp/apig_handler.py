@@ -23,4 +23,12 @@ def handle(event, context=None):
         items = yelp_table.get_all_records(user_id)
         response = items_to_response(items)
         return {"statusCode": HTTPStatus.OK, "body": json.dumps(response)}
+    if method == "POST":
+        upsert_user_id(user_id)
+        return {"statusCode": HTTPStatus.OK}
+    if method == "DELETE":
+        config_table.delete_user_id(user_id)
+        yelp_table.delete_user_id(user_id)
+        url_table.delete_user_id(user_id)
+        return {"statusCode": HTTPStatus.OK}
     return {"statusCode": HTTPStatus.NOT_IMPLEMENTED}

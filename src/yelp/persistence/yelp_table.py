@@ -125,3 +125,20 @@ def get_user_id_from_review_id(review_id: str):
             f"More than 1 UserId found for ReviewId. [{review_id=}, {items=}]"
         )
     return items[0][_YelpTableSchema.USER_ID]
+
+
+def delete_records(records):
+    keys = [
+        {
+            _YelpTableSchema.USER_ID: item[_YelpTableSchema.USER_ID],
+            _YelpTableSchema.SORT_KEY: item[_YelpTableSchema.SORT_KEY],
+        }
+        for item in records
+    ]
+    with YELP_TABLE.batch_writer() as batch:
+        for key in keys:
+            batch.delete_item(Key=key)
+
+
+def delete_user_id(user_id):
+    delete_records(get_all_records(user_id))

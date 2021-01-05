@@ -67,3 +67,26 @@ def update_fetched_url(url, status_code=-1):
         },
     )
     print(f"Updated fetched URL. [{user_id=}, {url=}, {status_code=}]")
+
+
+def get_all_records(user_id):
+    return URL_TABLE.query(KeyConditionExpression=Key(UrlTableSchema.USER_ID).eq(user_id))[
+        "Items"
+    ]
+
+
+def delete_records(records):
+    keys = [
+        {
+            UrlTableSchema.USER_ID: item[UrlTableSchema.USER_ID],
+            UrlTableSchema.SORT_KEY: item[UrlTableSchema.SORT_KEY],
+        }
+        for item in records
+    ]
+    with URL_TABLE.batch_writer() as batch:
+        for key in keys:
+            batch.delete_item(Key=key)
+
+
+def delete_user_id(user_id):
+    delete_records(get_all_records(user_id))

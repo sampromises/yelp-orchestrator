@@ -203,10 +203,12 @@ class YelpOrchestratorStack(core.Stack):
 
     def add_permissions(self):
         # Add permissions
+        self.config_table.grant_read_write_data(self.apig_handler)
         self.config_table.grant_read_data(self.url_requester)
-        self.yelp_table.grant_read_data(self.apig_handler)
+        self.yelp_table.grant_read_write_data(self.apig_handler)
         self.yelp_table.grant_read_data(self.url_requester)
         self.yelp_table.grant_read_write_data(self.yelp_parser)
+        self.url_table.grant_read_write_data(self.apig_handler)
         self.url_table.grant_read_write_data(self.url_requester)
         self.url_table.grant_read_write_data(self.page_fetcher)
         self.page_bucket.grant_read_write(self.yelp_parser)
