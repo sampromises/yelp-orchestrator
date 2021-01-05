@@ -2,15 +2,8 @@ import json
 from collections import defaultdict
 from http import HTTPStatus
 
-import boto3
-from boto3.dynamodb.conditions import Key
-
-from yelp.config import YELP_TABLE_NAME
-
-
-def get_items(user_id):
-    table = boto3.resource("dynamodb").Table(YELP_TABLE_NAME)
-    return table.query(KeyConditionExpression=Key("UserId").eq(user_id)).get("Items")
+from yelp.persistence import config_table, url_table, yelp_table
+from yelp.persistence.config_table import upsert_user_id
 
 
 def items_to_response(items):
@@ -23,9 +16,11 @@ def items_to_response(items):
 
 def handle(event, context=None):
     print(f"Triggered for event: {event}")
-    if event["httpMethod"] == "GET":
-        user_id = event["queryStringParameters"].get("userId")
-        items = get_items(user_id)
+    method, user_id = event["httpMethod"], event["queryStringParameters"].get("userId")
+    print(f"{method=}/{user_id=}")
+
+    if method == "GET":
+        items = yelp_table.get_all_records(user_id)
         response = items_to_response(items)
         return {"statusCode": HTTPStatus.OK, "body": json.dumps(response)}
     return {"statusCode": HTTPStatus.NOT_IMPLEMENTED}

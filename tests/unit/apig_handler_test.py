@@ -1,24 +1,7 @@
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
-from boto3.dynamodb.conditions import Key
 from tests.util import random_string
-from yelp.apig_handler import get_items, handle, items_to_response
-
-
-@patch("yelp.apig_handler.boto3.resource")
-def test_get_items(mock_resource):
-    # Given
-    user_id = random_string()
-    mock_table = Mock()
-    mock_table.query.return_value = {"Items": "TestResult"}
-    mock_resource.return_value.Table.return_value = mock_table
-
-    # When
-    result = get_items(user_id)
-
-    # Then
-    assert result == "TestResult"
-    mock_table.query.assert_called_once_with(KeyConditionExpression=Key("UserId").eq(user_id))
+from yelp.apig_handler import handle, items_to_response
 
 
 def test_items_to_response():
@@ -43,8 +26,8 @@ def test_items_to_response():
 
 
 @patch("yelp.apig_handler.items_to_response")
-@patch("yelp.apig_handler.get_items")
-def test_handle(mock_get_items, mock_items_to_response):
+@patch("yelp.apig_handler.yelp_table")
+def test_handle_get(_, mock_items_to_response):
     # Given
     response = {"foo": "bar", "biz": 42}
     mock_items_to_response.return_value = response
