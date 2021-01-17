@@ -11,6 +11,9 @@ aws-cdk.aws_s3
 aws-cdk.aws_s3_notifications
 aws-cdk.aws_dynamodb
 aws-cdk.aws_cloudwatch
+aws-cdk.aws_cloudwatch_actions
+aws-cdk.aws_sns
+aws_cdk.aws_sns_subscriptions
 
 pytest
 pylint

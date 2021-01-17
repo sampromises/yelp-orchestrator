@@ -6,6 +6,7 @@ from os import path
 from aws_cdk import (
     aws_apigateway,
     aws_cloudwatch,
+    aws_cloudwatch_actions,
     aws_dynamodb,
     aws_events,
     aws_events_targets,
@@ -13,12 +14,15 @@ from aws_cdk import (
     aws_lambda_event_sources,
     aws_s3,
     aws_s3_notifications,
+    aws_sns,
+    aws_sns_subscriptions,
     core,
 )
 
 FETCH_BATCH_SIZE = os.environ["FETCH_BATCH_SIZE"]
 URL_TABLE_TTL = os.environ["URL_TABLE_TTL"]
 YELP_TABLE_TTL = os.environ["YELP_TABLE_TTL"]
+ALARM_TOPIC_EMAIL = os.environ["ALARM_TOPIC_EMAIL"]
 
 STACK_NAME = "YelpOrchestrator"
 API_NAME = "YelpOrchestratorAPI"
@@ -31,6 +35,8 @@ PAGE_BUCKET_NAME = "YelpOrchestratorPageBucket"
 class YelpOrchestratorStack(core.Stack):
     def __init__(self, scope: core.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        self.create_alarm_topic()
 
         self.create_page_bucket()
         self.create_url_table()
@@ -109,7 +115,7 @@ class YelpOrchestratorStack(core.Stack):
         )
 
     def create_url_requester(self):
-        url_requester = self.create_lambda("url_requester")
+        url_requester = self.create_lambda_with_error_alarm("url_requester")
         url_requester.add_event_source(
             aws_lambda_event_sources.DynamoEventSource(
                 self.yelp_table,
@@ -138,7 +144,7 @@ class YelpOrchestratorStack(core.Stack):
         return self.url_requester
 
     def create_page_fetcher(self):
-        page_fetcher = self.create_lambda("page_fetcher")
+        page_fetcher = self.create_lambda_with_error_alarm("page_fetcher")
         rule = aws_events.Rule(
             self,
             "PageFetcherRule",
@@ -151,7 +157,7 @@ class YelpOrchestratorStack(core.Stack):
         return self.page_fetcher
 
     def create_yelp_parser(self):
-        yelp_parser = self.create_lambda("yelp_parser")
+        yelp_parser = self.create_lambda_with_error_alarm("yelp_parser")
         self.page_bucket.add_event_notification(
             aws_s3.EventType.OBJECT_CREATED,
             aws_s3_notifications.LambdaDestination(yelp_parser),
@@ -160,12 +166,12 @@ class YelpOrchestratorStack(core.Stack):
         return self.yelp_parser
 
     def create_apig_handler(self):
-        apig_handler = self.create_lambda("apig_handler")
+        apig_handler = self.create_lambda_with_error_alarm("apig_handler")
         self.apig_handler = apig_handler
         return self.apig_handler
 
-    def create_lambda(self, lambda_name):
-        return aws_lambda.Function(
+    def create_lambda_with_error_alarm(self, lambda_name):
+        _lambda = aws_lambda.Function(
             self,
             self.snake_to_pascal_case(lambda_name),
             runtime=aws_lambda.Runtime.PYTHON_3_8,
@@ -174,6 +180,11 @@ class YelpOrchestratorStack(core.Stack):
             timeout=core.Duration.seconds(300),
             layers=self.create_dependencies_layer(lambda_name),
         )
+        self.create_error_alarm(
+            alarm_name=f"{self.snake_to_pascal_case(lambda_name)}ErrorAlarm",
+            error_metric=_lambda.metric_errors(period=core.Duration.minutes(5), statistic="sum"),
+        )
+        return _lambda
 
     # Taken from: https://stackoverflow.com/a/61248003
     def create_dependencies_layer(self, function_name) -> aws_lambda.LayerVersion:
@@ -245,6 +256,27 @@ class YelpOrchestratorStack(core.Stack):
             *self.get_generic_lambda_graphs(self.page_fetcher),
         )
         self.dashboard = dashboard
+
+    def create_alarm_topic(self):
+        topic_name = f"{STACK_NAME}ErrorTopic"
+        topic = aws_sns.Topic(self, id=topic_name, topic_name=topic_name)
+        topic.add_subscription(aws_sns_subscriptions.EmailSubscription(ALARM_TOPIC_EMAIL))
+        self.alarm_topic = topic
+
+    def create_error_alarm(self, alarm_name, error_metric):
+        alarm = aws_cloudwatch.Alarm(
+            self,
+            alarm_name,
+            alarm_name=alarm_name,
+            metric=error_metric,
+            evaluation_periods=1,
+            comparison_operator=aws_cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
+            threshold=0,
+            datapoints_to_alarm=1,
+            treat_missing_data=aws_cloudwatch.TreatMissingData.NOT_BREACHING,
+        )
+        alarm.add_alarm_action(aws_cloudwatch_actions.SnsAction(self.alarm_topic))
+        return alarm
 
     @staticmethod
     def get_s3_graphs(bucket):
