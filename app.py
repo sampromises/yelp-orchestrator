@@ -208,9 +208,19 @@ class YelpOrchestratorStack(core.Stack):
         return []
 
     def create_apigateway(self):
-        self.apig = aws_apigateway.LambdaRestApi(
-            self, API_NAME, handler=self.apig_handler, proxy=True, deploy=True
+        apig = aws_apigateway.LambdaRestApi(
+            self, API_NAME, handler=self.apig_handler, proxy=False, deploy=True
         )
+
+        users = apig.root.add_resource("users")
+        users.add_method("GET")
+
+        user = apig.root.add_resource("{userId}")
+        user.add_method("GET")
+        user.add_method("POST")
+        user.add_method("DELETE")
+
+        self.apig = apig
 
     def add_permissions(self):
         # Add permissions
