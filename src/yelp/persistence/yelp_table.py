@@ -109,6 +109,10 @@ def update_review_status(user_id, review_id: ReviewId, status):
     )
 
 
+class NoUserIdFoundError(Exception):
+    pass
+
+
 class MultipleUserIdsFoundError(Exception):
     pass
 
@@ -119,7 +123,7 @@ def get_user_id_from_review_id(review_id: str):
         IndexName=_ReviewSchema.REVIEW_ID,
     )["Items"]
     if not items:
-        return None
+        raise NoUserIdFoundError(f"No UserId found for ReviewId. [{review_id=}]")
     if len(items) > 1:
         raise MultipleUserIdsFoundError(
             f"More than 1 UserId found for ReviewId. [{review_id=}, {items=}]"

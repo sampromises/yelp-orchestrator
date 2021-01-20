@@ -8,6 +8,7 @@ from tests.util import random_string
 from yelp.persistence import yelp_table
 from yelp.persistence.yelp_table import (
     MultipleUserIdsFoundError,
+    NoUserIdFoundError,
     ReviewId,
     ReviewMetadata,
     UserMetadata,
@@ -162,11 +163,9 @@ def test_get_user_id_from_review_id_doesnt_exist():
     mock_yelp_table.query.return_value = {"Items": []}
     yelp_table.YELP_TABLE = mock_yelp_table
 
-    # When
-    result = get_user_id_from_review_id(review_id)
-
-    # Then
-    assert not result
+    # When, Then
+    with pytest.raises(NoUserIdFoundError):
+        get_user_id_from_review_id(review_id)
 
 
 def test_get_user_id_from_review_id_multiple():
