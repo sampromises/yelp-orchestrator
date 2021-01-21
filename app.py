@@ -72,7 +72,7 @@ class YelpOrchestratorStack(core.Stack):
             partition_key=aws_dynamodb.Attribute(
                 name="UserId", type=aws_dynamodb.AttributeType.STRING
             ),
-            sort_key=aws_dynamodb.Attribute(name="PageUrl", type=aws_dynamodb.AttributeType.STRING),
+            sort_key=aws_dynamodb.Attribute(name="SortKey", type=aws_dynamodb.AttributeType.STRING),
             time_to_live_attribute="TimeToLive",
         )
         url_table.add_global_secondary_index(

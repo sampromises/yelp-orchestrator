@@ -5,7 +5,7 @@ import boto3
 
 from yelp.config import CONFIG_TABLE_NAME, YELP_TABLE_NAME
 from yelp.persistence.config_table import ConfigTableSchema, get_all_user_ids
-from yelp.persistence.url_table import upsert_new_url
+from yelp.persistence.url_table import UrlType, upsert_new_url
 from yelp.persistence.yelp_table import (
     _MetadataSchema,
     _ReviewSchema,
