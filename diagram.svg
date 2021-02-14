@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="500px" preserveAspectRatio="none" style="width:611px;height:500px;" version="1.1" viewBox="0 0 611 500" width="611px" zoomAndPan="magnify"><defs><filter height="300%" id="fos3xsxtb4e7p" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[c1f5c7eba512d000edea73f6efebe950]
+entity ApiGatewayHandler--><rect fill="#FEFECE" filter="url(#fos3xsxtb4e7p)" height="36.4883" style="stroke:#000000;stroke-width:1.5;" width="154" x="7" y="7"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="134" x="17" y="30.5352">ApiGatewayHandler</text><!--MD5=[f461a749e69d8655da93159003148879]
+entity UrlRequester--><rect fill="#FEFECE" filter="url(#fos3xsxtb4e7p)" height="36.4883" style="stroke:#000000;stroke-width:1.5;" width="109" x="29.5" y="149"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="89" x="39.5" y="172.5352">UrlRequester</text><!--MD5=[3825ed1666a862904fba3c32b980963c]
+entity PageFetcher--><rect fill="#FEFECE" filter="url(#fos3xsxtb4e7p)" height="36.4883" style="stroke:#000000;stroke-width:1.5;" width="104" x="32" y="405"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="84" x="42" y="428.5352">PageFetcher</text><!--MD5=[4b34eb89eed6b9f95b99797ccda03ac2]
+entity YelpParser--><rect fill="#FEFECE" filter="url(#fos3xsxtb4e7p)" height="36.4883" style="stroke:#000000;stroke-width:1.5;" width="93" x="37.5" y="291"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="73" x="47.5" y="314.5352">YelpParser</text><!--MD5=[eb6c77829e5bbf610c53aff6e04c42f9]
+entity ConfigTable--><path d="M500,29.5 C500,19.5 552,19.5 552,19.5 C552,19.5 604,19.5 604,29.5 L604,54.9883 C604,64.9883 552,64.9883 552,64.9883 C552,64.9883 500,64.9883 500,54.9883 L500,29.5 " fill="#FEFECE" filter="url(#fos3xsxtb4e7p)" style="stroke:#000000;stroke-width:1.5;"/><path d="M500,29.5 C500,39.5 552,39.5 552,39.5 C552,39.5 604,39.5 604,29.5 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="84" x="510" y="57.0352">ConfigTable</text><!--MD5=[3c52d18665f3a2abc88192ba2a0c7d3c]
+entity YelpTable--><path d="M508,154.5 C508,144.5 552,144.5 552,144.5 C552,144.5 596,144.5 596,154.5 L596,179.9883 C596,189.9883 552,189.9883 552,189.9883 C552,189.9883 508,189.9883 508,179.9883 L508,154.5 " fill="#FEFECE" filter="url(#fos3xsxtb4e7p)" style="stroke:#000000;stroke-width:1.5;"/><path d="M508,154.5 C508,164.5 552,164.5 552,164.5 C552,164.5 596,164.5 596,154.5 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="68" x="518" y="182.0352">YelpTable</text><!--MD5=[c68d0d30e0415d978cd5925426120eaf]
+entity UrlTable--><path d="M513,268.5 C513,258.5 552,258.5 552,258.5 C552,258.5 591,258.5 591,268.5 L591,293.9883 C591,303.9883 552,303.9883 552,303.9883 C552,303.9883 513,303.9883 513,293.9883 L513,268.5 " fill="#FEFECE" filter="url(#fos3xsxtb4e7p)" style="stroke:#000000;stroke-width:1.5;"/><path d="M513,268.5 C513,278.5 552,278.5 552,278.5 C552,278.5 591,278.5 591,268.5 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="58" x="523" y="296.0352">UrlTable</text><!--MD5=[41b786c81475de18d4184d3b9da907ad]
+entity PageBucket--><path d="M503,382.5 C503,372.5 552,372.5 552,372.5 C552,372.5 601,372.5 601,382.5 L601,407.9883 C601,417.9883 552,417.9883 552,417.9883 C552,417.9883 503,417.9883 503,407.9883 L503,382.5 " fill="#FEFECE" filter="url(#fos3xsxtb4e7p)" style="stroke:#000000;stroke-width:1.5;"/><path d="M503,382.5 C503,392.5 552,392.5 552,392.5 C552,392.5 601,392.5 601,382.5 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="78" x="513" y="410.0352">PageBucket</text><!--MD5=[da8abf1596b0554006701960fd02d446]
+link ApiGatewayHandler to ConfigTable--><path d="M161.03,25.63 C238.73,26.58 362.85,28.99 470,35 C477.94,35.45 486.3,36.04 494.52,36.68 " fill="none" id="ApiGatewayHandler-to-ConfigTable" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="499.61,37.09,490.9587,32.3831,494.626,36.6901,490.3189,40.3574,499.61,37.09" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="77" x="292" y="23.5684">[GET] users/</text><!--MD5=[4ddca41ad3e0801224346b78aa100f3a]
+link ApiGatewayHandler to YelpTable--><path d="M132.7,43.06 C150.74,49.27 171.6,55.73 191,60 C312.9,86.82 356.58,39.91 470,92 C493.6,102.84 514.91,123.22 529.75,140.01 " fill="none" id="ApiGatewayHandler-to-YelpTable" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="533.37,144.19,530.474,134.7765,530.0856,140.42,524.4421,140.0316,533.37,144.19" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="209" x="226" y="56.5684">[POST/GET/DELETE] user/{userId}</text><!--MD5=[8c2abfa736c38ea8c1a3c191553f971c]
+reverse link UrlRequester to ConfigTable--><path d="M143.75,156.6 C159.11,154 175.66,151.29 191,149 C314.66,130.53 356.04,164.44 470,113 C494.54,101.92 517.1,80.84 532.15,64.52 " fill="none" id="UrlRequester-backto-ConfigTable" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="138.59,157.48,148.1355,159.9057,143.5185,156.6372,146.7869,152.0201,138.59,157.48" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="251" x="205" y="109.5684">Determine missing URLs (UserMetadata)</text><!--MD5=[c56f73a92a6c82b8213b35845b9bbb45]
+reverse link UrlRequester to YelpTable--><path d="M143.81,168.96 C159.17,169.39 175.7,169.79 191,170 C314.99,171.76 346.02,172.3 470,170 C482.24,169.78 495.52,169.36 507.71,168.9 " fill="none" id="UrlRequester-backto-YelpTable" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="138.65,168.82,147.5321,173.0754,143.648,168.9628,147.7606,165.0787,138.65,168.82" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="277" x="192" y="166.5684">Determine missing URLs (Reviews, Statuses)</text><!--MD5=[02bba6d5fb6bf3b4328897688436a570]
+link UrlRequester to UrlTable--><path d="M138.52,182.67 C155.28,187.44 173.87,192.58 191,197 C251.05,212.5 425.59,252.47 507.55,271.13 " fill="none" id="UrlRequester-to-UrlTable" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="512.81,272.33,504.9248,266.4289,507.9352,271.2182,503.1459,274.2286,512.81,272.33" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="114" x="273.5" y="193.5684">Add missing URLs</text><!--MD5=[e644631af366cbb7ee312c36710e4280]
+reverse link PageFetcher to UrlTable--><path d="M141.37,426.1 C234.55,430.21 415.82,433.64 470,402 C491.4,389.51 486.3,375.65 500,355 C511.56,337.58 524.99,318.12 535.17,303.53 " fill="none" id="PageFetcher-backto-UrlTable" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="136.18,425.86,145.0005,430.2417,141.1754,426.0741,145.343,422.249,136.18,425.86" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="117" x="272" y="398.5684">Get batch (N URLs)</text><!--MD5=[0b7697ae7892462f3fcc464c3b3fe760]
+link PageFetcher to PageBucket--><path d="M133.93,441.04 C151.65,446.7 171.98,452.19 191,455 C313.67,473.12 352.25,493.86 470,455 C490.51,448.23 510.06,434.05 524.82,421.17 " fill="none" id="PageFetcher-to-PageBucket" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="528.86,417.58,519.4759,420.5696,525.123,420.9018,524.7908,426.5489,528.86,417.58" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="98" x="281.5" y="451.5684">Upload N HTML</text><!--MD5=[96771a26582abe4a6bae1a38aebcef58]
+reverse link YelpParser to PageBucket--><path d="M135.59,326.13 C152.99,331.52 172.7,337.09 191,341 C313.26,367.16 346.85,355.42 470,377 C480.64,378.87 492,381.19 502.74,383.53 " fill="none" id="YelpParser-backto-PageBucket" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="130.75,324.61,138.1539,331.1048,135.5239,326.0965,140.5323,323.4665,130.75,324.61" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="67" x="297" y="337.5684">New HTML</text><!--MD5=[5e14237471e1ab296a4c00ca079c2a61]
+link YelpParser to YelpTable--><path d="M130.54,311.42 C219.7,315.36 413.52,319.72 470,287 C491.12,274.77 486.41,261.28 500,241 C510.55,225.27 522.57,207.81 532.29,193.8 " fill="none" id="YelpParser-to-YelpTable" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="535.23,189.57,526.8026,194.667,532.3713,193.6722,533.3661,199.2409,535.23,189.57" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="88" x="286.5" y="283.5684">Parsed results</text><!--MD5=[46aaeacffa6db646fca05519c277cd48]
+@startuml diagram
+
+left to right direction
+
+rectangle ApiGatewayHandler
+rectangle UrlRequester
+rectangle PageFetcher
+rectangle YelpParser
+
+database ConfigTable
+database YelpTable
+database UrlTable
+database PageBucket
+
+
+ApiGatewayHandler - -> ConfigTable: [GET] users/
+ApiGatewayHandler - -> YelpTable: [POST/GET/DELETE] user/{userId}
+
+UrlRequester <- - ConfigTable: Determine missing URLs (UserMetadata)
+UrlRequester <- - YelpTable: Determine missing URLs (Reviews, Statuses)
+UrlRequester - -> UrlTable: Add missing URLs
+
+PageFetcher <- - UrlTable: Get batch (N URLs)
+PageFetcher - -> PageBucket: Upload N HTML
+
+YelpParser <- - PageBucket: New HTML
+YelpParser - -> YelpTable: Parsed results
+
+@enduml
+
+PlantUML version 1.2021.01(Tue Feb 02 02:55:08 EST 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
