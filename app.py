@@ -122,6 +122,7 @@ class YelpOrchestratorStack(core.Stack):
                 starting_position=aws_lambda.StartingPosition.TRIM_HORIZON,
                 batch_size=5,
                 bisect_batch_on_error=True,
+                retry_attempts=0,
             )
         )
         url_requester.add_event_source(
@@ -130,6 +131,7 @@ class YelpOrchestratorStack(core.Stack):
                 starting_position=aws_lambda.StartingPosition.TRIM_HORIZON,
                 batch_size=5,
                 bisect_batch_on_error=True,
+                retry_attempts=0,
             )
         )
         rule = aws_events.Rule(
