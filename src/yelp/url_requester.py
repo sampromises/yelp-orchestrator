@@ -21,16 +21,24 @@ REVIEW_STATUS_URL = "https://www.yelp.com/biz/{}?hrid={}"
 DDB_TYPE_DESERIALIZER = boto3.dynamodb.types.TypeDeserializer()
 
 
+def get_user_metadata_url(user_id):
+    return USER_METADATA_URL.format(user_id)
+
+
 def _create_user_metadata_url(user_id: str):
-    upsert_new_url(user_id, USER_METADATA_URL.format(user_id))
+    upsert_new_url(user_id, get_user_metadata_url(user_id))
+
+
+def get_user_review_page_urls(user_id, review_count):
+    return [USER_REVIEW_PAGES_URL.format(user_id, i) for i in range(0, review_count, 10)]
 
 
 def _create_user_review_pages_urls(user_metadata_record: Dict):
     if user_metadata_record:
         user_id = user_metadata_record.get(_YelpTableSchema.USER_ID)
         review_count = int(user_metadata_record.get(_MetadataSchema.REVIEW_COUNT))
-        for i in range(0, review_count, 10):
-            upsert_new_url(user_id, USER_REVIEW_PAGES_URL.format(user_id, i))
+        for url in get_user_review_page_urls(user_id, review_count):
+            upsert_new_url(user_id, url)
 
 
 def _create_review_status_url(review_record: Dict):
