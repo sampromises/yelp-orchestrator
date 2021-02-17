@@ -16,6 +16,20 @@ class FetchError(Exception):
         super().__init__(args)
 
 
+def fetch(url):
+    resp = requests.get(url)
+    print(
+        f"GET request finished. [status_code={resp.status_code}, content_length={len(resp.content)}]"
+    )
+    if resp.status_code != 200:
+        raise FetchError(
+            resp.status_code,
+            f"Fetch error. [status_code={resp.status_code}, text={resp.text}]",
+        )
+    return resp.content
+
+
+# TODO: Replace with ThreadPoolExecutor
 class BatchProcessor:
     def __init__(self):
         self.queue = Queue()
@@ -25,24 +39,17 @@ class BatchProcessor:
         item = self.queue.get()
         url = item[UrlTableSchema.URL]
         try:
-            # Fetch HTML
-            resp = requests.get(url)
-            print(
-                f"GET request finished. [status_code={resp.status_code}, content_length={len(resp.content)}]"
-            )
+            try:
+                content = fetch(url)
+                upload_page(url, content)
+                status_code = 200
+            except FetchError as err:
+                self.errors.append(err)
+                traceback.print_exc()
+                status_code = err.status_code
 
-            update_fetched_url(url, resp.status_code)
+            update_fetched_url(url, status_code)
 
-            if resp.status_code != 200:
-                raise FetchError(
-                    resp.status_code,
-                    f"Fetch error. [status_code={resp.status_code}, text={resp.text}]",
-                )
-
-            upload_page(url, resp.content)
-        except FetchError as err:
-            self.errors.append(err)
-            traceback.print_exc()
         except Exception as err:
             update_fetched_url(url)
             self.errors.append(err)
