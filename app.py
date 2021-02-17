@@ -23,7 +23,6 @@ FETCH_BATCH_SIZE = os.environ["FETCH_BATCH_SIZE"]
 URL_TABLE_TTL = os.environ["URL_TABLE_TTL"]
 YELP_TABLE_TTL = os.environ["YELP_TABLE_TTL"]
 ALARM_TOPIC_EMAIL = os.environ["ALARM_TOPIC_EMAIL"]
-
 STACK_NAME = "YelpOrchestrator"
 API_NAME = "YelpOrchestratorAPI"
 URL_TABLE_NAME = "UrlTable"
@@ -48,6 +47,7 @@ class YelpOrchestratorStack(core.Stack):
             self.create_page_fetcher(),
             self.create_yelp_parser(),
             self.create_apig_handler(),
+            self.create_yelp_cleaner(),
         )
 
         self.create_apigateway()
@@ -158,6 +158,11 @@ class YelpOrchestratorStack(core.Stack):
         self.page_fetcher = page_fetcher
         return self.page_fetcher
 
+    def create_apig_handler(self):
+        apig_handler = self.create_lambda_with_error_alarm("apig_handler")
+        self.apig_handler = apig_handler
+        return self.apig_handler
+
     def create_yelp_parser(self):
         yelp_parser = self.create_lambda_with_error_alarm("yelp_parser")
         self.page_bucket.add_event_notification(
@@ -167,12 +172,24 @@ class YelpOrchestratorStack(core.Stack):
         self.yelp_parser = yelp_parser
         return self.yelp_parser
 
-    def create_apig_handler(self):
-        apig_handler = self.create_lambda_with_error_alarm("apig_handler")
-        self.apig_handler = apig_handler
-        return self.apig_handler
+    def create_yelp_cleaner(self):
+        yelp_cleaner = self.create_lambda_with_error_alarm("yelp_cleaner", memory_size=256)
+        rule = aws_events.Rule(
+            self,
+            "YelpCleanerRule",
+            schedule=aws_events.Schedule.cron(
+                minute=f"*/15",
+                hour="*",
+                month="*",
+                week_day="*",
+                year="*",
+            ),
+        )
+        rule.add_target(aws_events_targets.LambdaFunction(yelp_cleaner))
+        self.yelp_cleaner = yelp_cleaner
+        return self.yelp_cleaner
 
-    def create_lambda_with_error_alarm(self, lambda_name):
+    def create_lambda_with_error_alarm(self, lambda_name, memory_size=128):
         _lambda = aws_lambda.Function(
             self,
             self.snake_to_pascal_case(lambda_name),
@@ -181,6 +198,7 @@ class YelpOrchestratorStack(core.Stack):
             code=aws_lambda.Code.asset("./src"),
             timeout=core.Duration.seconds(300),
             layers=self.create_dependencies_layer(lambda_name),
+            memory_size=memory_size,
         )
         self.create_error_alarm(
             alarm_name=f"{self.snake_to_pascal_case(lambda_name)}ErrorAlarm",
@@ -228,12 +246,15 @@ class YelpOrchestratorStack(core.Stack):
         # Add permissions
         self.config_table.grant_read_write_data(self.apig_handler)
         self.config_table.grant_read_data(self.url_requester)
+        self.config_table.grant_read_data(self.yelp_cleaner)
         self.yelp_table.grant_read_write_data(self.apig_handler)
         self.yelp_table.grant_read_data(self.url_requester)
         self.yelp_table.grant_read_write_data(self.yelp_parser)
+        self.yelp_table.grant_read_write_data(self.yelp_cleaner)
         self.url_table.grant_read_write_data(self.apig_handler)
         self.url_table.grant_read_write_data(self.url_requester)
         self.url_table.grant_read_write_data(self.page_fetcher)
+        self.url_table.grant_read_write_data(self.yelp_cleaner)
         self.page_bucket.grant_read_write(self.yelp_parser)
         self.page_bucket.grant_read_write(self.page_fetcher)
 
@@ -266,6 +287,9 @@ class YelpOrchestratorStack(core.Stack):
             *self.get_generic_lambda_graphs(self.url_requester),
             self.text_widget("PageFetcher", "#"),
             *self.get_generic_lambda_graphs(self.page_fetcher),
+            self.text_widget("YelpCleaner", "#"),
+            *self.get_generic_lambda_graphs(self.yelp_cleaner),
+            self.get_yelp_cleaner_graph(),
         )
         self.dashboard = dashboard
 
@@ -323,6 +347,21 @@ class YelpOrchestratorStack(core.Stack):
             YelpOrchestratorStack.graph_widget("Invocations", _lambda.metric_invocations()),
             YelpOrchestratorStack.graph_widget("Duration", _lambda.metric_duration()),
             YelpOrchestratorStack.graph_widget("Errors", _lambda.metric_errors()),
+        )
+
+    @staticmethod
+    def get_yelp_cleaner_graph():
+        return YelpOrchestratorStack.graph_widget(
+            "YelpCleanerDeletions",
+            *[
+                aws_cloudwatch.Metric(
+                    namespace="YelpOrchestrator",
+                    metric_name=metric_name,
+                    statistic="Sum",
+                    period=core.Duration.minutes(5),
+                )
+                for metric_name in ("UrlTableRecordsDeleted", "YelpTableRecordsDeleted")
+            ],
         )
 
     @staticmethod
